@@ -1,10 +1,10 @@
 package ro.fmi.awbd.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
+import ro.fmi.awbd.exception.BadRequestException;
+import ro.fmi.awbd.model.dto.response.StatsResponse;
 import ro.fmi.awbd.model.entity.InvoiceEntity;
 import ro.fmi.awbd.model.entity.ShootEntity;
 import ro.fmi.awbd.model.enums.InvoiceStatus;
@@ -26,13 +26,13 @@ public class StatsService {
     @Transactional(readOnly = true)
     public StatsResponse getStats(OffsetDateTime from, OffsetDateTime to) {
         if (from == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "from is required");
+            throw new BadRequestException("from is required");
         }
         if (to == null) {
             to = OffsetDateTime.now();
         }
         if (from.isAfter(to)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "from must be before to");
+            throw new BadRequestException("from must be before to");
         }
 
         List<ShootEntity> shoots = shootRepository.findByStartAtBetween(from, to);

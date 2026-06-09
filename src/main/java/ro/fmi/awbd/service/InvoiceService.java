@@ -1,14 +1,15 @@
 package ro.fmi.awbd.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
-import ro.fmi.awbd.model.entity.dto.mapper.InvoiceMapper;
-import ro.fmi.awbd.model.entity.dto.request.InvoiceCreateRequest;
-import ro.fmi.awbd.model.entity.dto.request.InvoiceUpdateRequest;
-import ro.fmi.awbd.model.entity.dto.response.InvoiceResponse;
+import ro.fmi.awbd.exception.DuplicateResourceException;
+import ro.fmi.awbd.exception.ResourceNotFoundException;
+import ro.fmi.awbd.model.dto.mapper.InvoiceMapper;
+import ro.fmi.awbd.model.dto.request.InvoiceCreateRequest;
+import ro.fmi.awbd.model.dto.request.InvoiceUpdateRequest;
+import ro.fmi.awbd.model.dto.response.InvoiceResponse;
 import ro.fmi.awbd.model.entity.ClientEntity;
 import ro.fmi.awbd.model.entity.InvoiceEntity;
 import ro.fmi.awbd.model.entity.ShootEntity;
@@ -19,6 +20,7 @@ import ro.fmi.awbd.repository.ShootRepository;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class InvoiceService {
 
     private final InvoiceRepository invoiceRepository;
@@ -29,17 +31,22 @@ public class InvoiceService {
     @Transactional(readOnly = true)
     public InvoiceResponse getInvoice(Long shootId) {
         InvoiceEntity invoice = invoiceRepository.findByShootId(shootId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invoice not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Invoice not found for shoot " + shootId));
         return invoiceMapper.toResponse(invoice);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean existsForShoot(Long shootId) {
+        return invoiceRepository.findByShootId(shootId).isPresent();
     }
 
     @Transactional
     public InvoiceResponse createInvoice(Long shootId, InvoiceCreateRequest request) {
         ShootEntity shoot = shootRepository.findById(shootId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Shoot not found"));
+                .orElseThrow(() -> ResourceNotFoundException.of("Shoot", shootId));
 
         if (invoiceRepository.findByShootId(shootId).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Invoice already exists for shoot");
+            throw new DuplicateResourceException("Invoice already exists for shoot " + shootId);
         }
 
         ClientEntity client = resolveClient(request.getClientId());
@@ -48,18 +55,22 @@ public class InvoiceService {
         invoice.setShoot(shoot);
         invoice.setClient(client);
 
+        if (invoice.getStatus() == null) {
+            invoice.setStatus(InvoiceStatus.DRAFT);
+        }
         if (invoice.getPaidAt() != null && invoice.getStatus() == InvoiceStatus.DRAFT) {
             invoice.setStatus(InvoiceStatus.PAID);
         }
 
         InvoiceEntity saved = invoiceRepository.save(invoice);
+        log.info("Created invoice id={} for shoot id={}", saved.getId(), shootId);
         return invoiceMapper.toResponse(saved);
     }
 
     @Transactional
     public InvoiceResponse updateInvoice(Long shootId, InvoiceUpdateRequest request) {
         InvoiceEntity invoice = invoiceRepository.findByShootId(shootId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invoice not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Invoice not found for shoot " + shootId));
 
         invoiceMapper.updateEntity(request, invoice);
 
@@ -72,11 +83,20 @@ public class InvoiceService {
         }
 
         InvoiceEntity saved = invoiceRepository.save(invoice);
+        log.info("Updated invoice id={}", saved.getId());
         return invoiceMapper.toResponse(saved);
+    }
+
+    @Transactional
+    public void deleteInvoice(Long shootId) {
+        InvoiceEntity invoice = invoiceRepository.findByShootId(shootId)
+                .orElseThrow(() -> new ResourceNotFoundException("Invoice not found for shoot " + shootId));
+        invoiceRepository.delete(invoice);
+        log.info("Deleted invoice for shoot id={}", shootId);
     }
 
     private ClientEntity resolveClient(Long clientId) {
         return clientRepository.findById(clientId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Client not found"));
+                .orElseThrow(() -> ResourceNotFoundException.of("Client", clientId));
     }
 }
