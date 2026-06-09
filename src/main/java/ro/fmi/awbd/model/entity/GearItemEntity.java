@@ -3,6 +3,7 @@ package ro.fmi.awbd.model.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+import ro.fmi.awbd.model.entity.security.User;
 import ro.fmi.awbd.model.enums.GearType;
 
 @Entity
@@ -34,5 +35,5 @@ public class GearItemEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_user_id", nullable = false)
-    private UserEntity owner;
+    private User owner;
 }

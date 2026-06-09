@@ -1,31 +1,33 @@
 package ro.fmi.awbd.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
-import ro.fmi.awbd.model.entity.dto.mapper.ShootMapper;
-import ro.fmi.awbd.model.entity.dto.request.ShootCreateRequest;
-import ro.fmi.awbd.model.entity.dto.request.ShootUpdateRequest;
-import ro.fmi.awbd.model.entity.dto.response.ShootListItemResponse;
-import ro.fmi.awbd.model.entity.dto.response.ShootResponse;
+import ro.fmi.awbd.exception.ResourceNotFoundException;
+import ro.fmi.awbd.model.dto.mapper.ShootMapper;
+import ro.fmi.awbd.model.dto.request.ShootCreateRequest;
+import ro.fmi.awbd.model.dto.request.ShootUpdateRequest;
+import ro.fmi.awbd.model.dto.response.ShootListItemResponse;
+import ro.fmi.awbd.model.dto.response.ShootResponse;
 import ro.fmi.awbd.model.entity.GearItemEntity;
 import ro.fmi.awbd.model.entity.LocationEntity;
 import ro.fmi.awbd.model.entity.ShootEntity;
-import ro.fmi.awbd.model.entity.UserEntity;
+import ro.fmi.awbd.model.entity.security.User;
 import ro.fmi.awbd.repository.GearItemRepository;
 import ro.fmi.awbd.repository.LocationRepository;
 import ro.fmi.awbd.repository.ShootRepository;
-import ro.fmi.awbd.repository.UserRepository;
+import ro.fmi.awbd.repository.security.UserRepository;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ShootService {
 
     private final ShootRepository shootRepository;
@@ -34,23 +36,49 @@ public class ShootService {
     private final UserRepository userRepository;
     private final ShootMapper shootMapper;
 
+    @Transactional(readOnly = true)
+    public List<ShootListItemResponse> getAllShoots() {
+        return shootRepository.findAll().stream().map(shootMapper::toListItemResponse).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ShootListItemResponse> getShoots(Pageable pageable) {
+        return shootRepository.findAll(pageable).map(shootMapper::toListItemResponse);
+    }
+
+    @Transactional(readOnly = true)
+    public ShootResponse getShootById(Long shootId) {
+        return shootMapper.toResponse(findEntity(shootId));
+    }
+
+    @Transactional(readOnly = true)
+    public List<ShootListItemResponse> getShootsForOwner(Long ownerId) {
+        if (!userRepository.existsById(ownerId)) {
+            throw ResourceNotFoundException.of("Owner user", ownerId);
+        }
+        return shootRepository.findByOwnerId(ownerId).stream()
+                .map(shootMapper::toListItemResponse)
+                .toList();
+    }
+
     @Transactional
     public ShootResponse createShoot(ShootCreateRequest request) {
         ShootEntity shoot = shootMapper.toEntity(request);
-
+        if (shoot.getStatus() == null) {
+            shoot.setStatus(ro.fmi.awbd.model.enums.ShootStatus.PLANNED);
+        }
         shoot.setOwner(resolveOwner(request.getOwnerId()));
         shoot.setLocation(resolveLocation(request.getLocationId()));
         shoot.setGearItems(resolveGearItems(request.getGearItemIds()));
 
         ShootEntity saved = shootRepository.save(shoot);
+        log.info("Created shoot id={} title='{}'", saved.getId(), saved.getTitle());
         return shootMapper.toResponse(saved);
     }
 
     @Transactional
     public ShootResponse updateShoot(Long shootId, ShootUpdateRequest request) {
-        ShootEntity shoot = shootRepository.findById(shootId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Shoot not found"));
-
+        ShootEntity shoot = findEntity(shootId);
         shootMapper.updateEntity(request, shoot);
 
         if (request.getLocationId() != null) {
@@ -64,46 +92,40 @@ public class ShootService {
         }
 
         ShootEntity saved = shootRepository.save(shoot);
+        log.info("Updated shoot id={}", saved.getId());
         return shootMapper.toResponse(saved);
     }
 
-    @Transactional(readOnly = true)
-    public ShootResponse getShootById(Long shootId) {
-        ShootEntity shoot = shootRepository.findById(shootId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Shoot not found"));
-        return shootMapper.toResponse(shoot);
+    @Transactional
+    public void deleteShoot(Long shootId) {
+        ShootEntity shoot = findEntity(shootId);
+        shootRepository.delete(shoot);
+        log.info("Deleted shoot id={}", shootId);
     }
 
-    @Transactional(readOnly = true)
-    public List<ShootListItemResponse> getShootsForOwner(Long ownerId) {
-        if (!userRepository.existsById(ownerId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Owner user not found");
-        }
-
-        return shootRepository.findByOwnerId(ownerId).stream()
-                .map(shootMapper::toListItemResponse)
-                .collect(Collectors.toList());
+    private ShootEntity findEntity(Long shootId) {
+        return shootRepository.findById(shootId)
+                .orElseThrow(() -> ResourceNotFoundException.of("Shoot", shootId));
     }
 
     private LocationEntity resolveLocation(Long locationId) {
         return locationRepository.findById(locationId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Location not found"));
+                .orElseThrow(() -> ResourceNotFoundException.of("Location", locationId));
     }
 
     private Set<GearItemEntity> resolveGearItems(Set<Long> gearItemIds) {
         if (gearItemIds == null || gearItemIds.isEmpty()) {
             return new HashSet<>();
         }
-
         List<GearItemEntity> items = gearItemRepository.findAllById(gearItemIds);
         if (items.size() != gearItemIds.size()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "One or more gear items not found");
+            throw new ResourceNotFoundException("One or more gear items not found");
         }
         return new HashSet<>(items);
     }
 
-    private UserEntity resolveOwner(Long ownerId) {
+    private User resolveOwner(Long ownerId) {
         return userRepository.findById(ownerId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Owner user not found"));
+                .orElseThrow(() -> ResourceNotFoundException.of("Owner user", ownerId));
     }
 }
