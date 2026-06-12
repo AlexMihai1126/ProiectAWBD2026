@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Dashboard')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<div th:replace="~{fragments/layout :: flash}"></div>
+<main class="container py-4">
+    <h1 class="mb-1">Photography Management</h1>
+    <p class="text-muted">Manage shoots, clients, locations, gear and invoicing.</p>
+
+    <div class="row g-3 mt-2">
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fa-solid fa-clapperboard me-2"></i>Shoots</h5>
+                    <p class="card-text text-muted">Plan and track photo/video sessions.</p>
+                    <a class="btn btn-primary" th:href="@{/shoots}">Open</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fa-solid fa-users me-2"></i>Clients</h5>
+                    <p class="card-text text-muted">Manage client contact details.</p>
+                    <a class="btn btn-primary" th:href="@{/clients}">Open</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fa-solid fa-location-dot me-2"></i>Locations</h5>
+                    <p class="card-text text-muted">Maintain shooting locations.</p>
+                    <a class="btn btn-primary" th:href="@{/locations}">Open</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fa-solid fa-camera me-2"></i>Gear</h5>
+                    <p class="card-text text-muted">Inventory of cameras and accessories.</p>
+                    <a class="btn btn-primary" th:href="@{/gear}">Open</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fa-solid fa-chart-line me-2"></i>Statistics</h5>
+                    <p class="card-text text-muted">Revenue and shoot stats over a period.</p>
+                    <a class="btn btn-primary" th:href="@{/stats}">Open</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

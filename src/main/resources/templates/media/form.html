@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Media form')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container py-4">
+    <h1 class="h3 mb-3" th:text="${editId != null} ? 'Edit media' : 'Add media'">Media</h1>
+
+    <form th:action="${editId != null} ? @{/shoots/{sid}/media/{mid}(sid=${shootId}, mid=${editId})} : @{/shoots/{sid}/media(sid=${shootId})}"
+          th:object="${form}" method="post" class="needs-validation" novalidate>
+        <div class="row">
+            <div class="mb-3 col-md-6">
+                <label class="form-label" for="mediaType">Type *</label>
+                <select class="form-select" th:classappend="${#fields.hasErrors('mediaType')} ? 'is-invalid'"
+                        id="mediaType" th:field="*{mediaType}" required>
+                    <option value="">-- select --</option>
+                    <option th:each="t : ${mediaTypes}" th:value="${t}" th:text="${t}">TYPE</option>
+                </select>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('mediaType')}" th:errors="*{mediaType}">err</div>
+            </div>
+            <div class="mb-3 col-md-6">
+                <label class="form-label" for="fileRef">File reference *</label>
+                <input class="form-control" th:classappend="${#fields.hasErrors('fileRef')} ? 'is-invalid'"
+                       id="fileRef" type="text" th:field="*{fileRef}" required maxlength="500">
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('fileRef')}" th:errors="*{fileRef}">err</div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="mb-3 col-md-4">
+                <label class="form-label" for="takenAt">Taken at</label>
+                <input class="form-control" id="takenAt" name="takenAt" type="datetime-local"
+                       th:value="${form.takenAt != null} ? ${#temporals.format(form.takenAt, 'yyyy-MM-dd''T''HH:mm')} : ''">
+            </div>
+            <div class="mb-3 col-md-2">
+                <label class="form-label" for="rating">Rating (1-5)</label>
+                <input class="form-control" th:classappend="${#fields.hasErrors('rating')} ? 'is-invalid'"
+                       id="rating" type="number" min="1" max="5" th:field="*{rating}">
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('rating')}" th:errors="*{rating}">err</div>
+            </div>
+            <div class="mb-3 col-md-3">
+                <label class="form-label" for="iso">ISO</label>
+                <input class="form-control" th:classappend="${#fields.hasErrors('iso')} ? 'is-invalid'"
+                       id="iso" type="number" min="50" max="204800" th:field="*{iso}">
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('iso')}" th:errors="*{iso}">err</div>
+            </div>
+            <div class="mb-3 col-md-3">
+                <label class="form-label" for="durationSeconds">Duration (s)</label>
+                <input class="form-control" id="durationSeconds" type="number" min="1" th:field="*{durationSeconds}">
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="notes">Notes</label>
+            <textarea class="form-control" id="notes" rows="2" th:field="*{notes}" maxlength="1000"></textarea>
+        </div>
+        <button class="btn btn-primary" type="submit">Save</button>
+        <a class="btn btn-secondary" th:href="@{/shoots/{id}(id=${shootId})}">Cancel</a>
+    </form>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<script>
+    (function () {
+        document.querySelectorAll('.needs-validation').forEach(function (f) {
+            f.addEventListener('submit', function (e) {
+                if (!f.checkValidity()) { e.preventDefault(); e.stopPropagation(); }
+                f.classList.add('was-validated');
+            });
+        });
+    })();
+</script>
+</body>
+</html>

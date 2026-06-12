@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Clients')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<div th:replace="~{fragments/layout :: flash}"></div>
+<main class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0">Clients</h1>
+        <a class="btn btn-success" th:href="@{/clients/new}"><i class="fa-solid fa-plus me-1"></i>New client</a>
+    </div>
+
+    <div th:if="${page.totalElements == 0}" class="alert alert-info">No clients yet.</div>
+
+    <table th:if="${page.totalElements > 0}" class="table table-striped table-hover align-middle">
+        <thead>
+        <tr>
+            <th><a th:href="@{/clients(sort='name,asc', size=${page.size})}">Name</a>
+                / <a th:href="@{/clients(sort='name,desc', size=${page.size})}">desc</a></th>
+            <th><a th:href="@{/clients(sort='email,asc', size=${page.size})}">Email</a>
+                / <a th:href="@{/clients(sort='email,desc', size=${page.size})}">desc</a></th>
+            <th>Phone</th>
+            <th class="text-end">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="c : ${page.content}">
+            <td><a th:href="@{/clients/{id}(id=${c.id})}" th:text="${c.name}">Name</a></td>
+            <td th:text="${c.email}">email</td>
+            <td th:text="${c.phone}">phone</td>
+            <td class="text-end">
+                <a class="btn btn-sm btn-outline-primary" th:href="@{/clients/{id}/edit(id=${c.id})}">Edit</a>
+                <form class="d-inline" th:action="@{/clients/{id}/delete(id=${c.id})}" method="post"
+                      onsubmit="return confirm('Delete this client?');">
+                    <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <nav th:replace="~{fragments/layout :: pagination(${page}, '/clients')}"></nav>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

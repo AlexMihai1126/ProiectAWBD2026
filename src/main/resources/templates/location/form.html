@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Location form')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container py-4">
+    <h1 class="h3 mb-3" th:text="${editId != null} ? 'Edit location' : 'New location'">Location</h1>
+
+    <form th:action="${editId != null} ? @{/locations/{id}(id=${editId})} : @{/locations}"
+          th:object="${form}" method="post" class="needs-validation" novalidate>
+        <div class="mb-3">
+            <label class="form-label" for="name">Name *</label>
+            <input class="form-control" th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'"
+                   id="name" type="text" th:field="*{name}" required maxlength="255">
+            <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">err</div>
+        </div>
+        <div class="row">
+            <div class="mb-3 col-md-6">
+                <label class="form-label" for="county">County</label>
+                <input class="form-control" id="county" type="text" th:field="*{county}" maxlength="255">
+            </div>
+            <div class="mb-3 col-md-6">
+                <label class="form-label" for="country">Country</label>
+                <input class="form-control" id="country" type="text" th:field="*{country}" maxlength="255">
+            </div>
+        </div>
+        <div class="row">
+            <div class="mb-3 col-md-6">
+                <label class="form-label" for="latitude">Latitude</label>
+                <input class="form-control" th:classappend="${#fields.hasErrors('latitude')} ? 'is-invalid'"
+                       id="latitude" type="number" step="any" min="-90" max="90" th:field="*{latitude}">
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('latitude')}" th:errors="*{latitude}">err</div>
+            </div>
+            <div class="mb-3 col-md-6">
+                <label class="form-label" for="longitude">Longitude</label>
+                <input class="form-control" th:classappend="${#fields.hasErrors('longitude')} ? 'is-invalid'"
+                       id="longitude" type="number" step="any" min="-180" max="180" th:field="*{longitude}">
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('longitude')}" th:errors="*{longitude}">err</div>
+            </div>
+        </div>
+        <button class="btn btn-primary" type="submit">Save</button>
+        <a class="btn btn-secondary" th:href="@{/locations}">Cancel</a>
+    </form>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<script>
+    (function () {
+        document.querySelectorAll('.needs-validation').forEach(function (f) {
+            f.addEventListener('submit', function (e) {
+                if (!f.checkValidity()) { e.preventDefault(); e.stopPropagation(); }
+                f.classList.add('was-validated');
+            });
+        });
+    })();
+</script>
+</body>
+</html>

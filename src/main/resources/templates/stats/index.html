@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Statistics')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container py-4">
+    <h1 class="h3 mb-3">Statistics</h1>
+
+    <form th:action="@{/stats}" method="get" class="row g-3 align-items-end mb-4">
+        <div class="col-md-4">
+            <label class="form-label" for="from">From *</label>
+            <input class="form-control" id="from" name="from" type="datetime-local" required
+                   th:value="${from != null} ? ${#temporals.format(from, 'yyyy-MM-dd''T''HH:mm')} : ''">
+        </div>
+        <div class="col-md-4">
+            <label class="form-label" for="to">To</label>
+            <input class="form-control" id="to" name="to" type="datetime-local"
+                   th:value="${to != null} ? ${#temporals.format(to, 'yyyy-MM-dd''T''HH:mm')} : ''">
+        </div>
+        <div class="col-md-4">
+            <button class="btn btn-primary" type="submit">Compute</button>
+        </div>
+    </form>
+
+    <div th:if="${stats != null}" class="row g-3">
+        <div class="col-md-3">
+            <div class="card text-bg-success"><div class="card-body">
+                <h6 class="card-subtitle mb-2">Paid revenue</h6>
+                <p class="h4 mb-0" th:text="${stats.paidAmount}">0</p>
+            </div></div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-bg-warning"><div class="card-body">
+                <h6 class="card-subtitle mb-2">Receivable</h6>
+                <p class="h4 mb-0" th:text="${stats.receivableAmount}">0</p>
+            </div></div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-bg-secondary"><div class="card-body">
+                <h6 class="card-subtitle mb-2">Planned shoots</h6>
+                <p class="h4 mb-0" th:text="${stats.plannedShoots}">0</p>
+            </div></div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-bg-info"><div class="card-body">
+                <h6 class="card-subtitle mb-2">Completed shoots</h6>
+                <p class="h4 mb-0" th:text="${stats.doneShoots}">0</p>
+            </div></div>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>
