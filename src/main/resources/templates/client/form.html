@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Client form')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container py-4">
+    <h1 class="h3 mb-3" th:text="${editId != null} ? 'Edit client' : 'New client'">Client</h1>
+
+    <form th:action="${editId != null} ? @{/clients/{id}(id=${editId})} : @{/clients}"
+          th:object="${form}" method="post" class="needs-validation" novalidate>
+        <div class="mb-3">
+            <label class="form-label" for="name">Name *</label>
+            <input class="form-control" th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'"
+                   id="name" type="text" th:field="*{name}" required maxlength="150">
+            <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">err</div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="email">Email</label>
+            <input class="form-control" th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'"
+                   id="email" type="email" th:field="*{email}" maxlength="200">
+            <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">err</div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="phone">Phone</label>
+            <input class="form-control" id="phone" type="text" th:field="*{phone}" maxlength="30">
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="notes">Notes</label>
+            <textarea class="form-control" id="notes" rows="3" th:field="*{notes}" maxlength="1000"></textarea>
+        </div>
+        <button class="btn btn-primary" type="submit">Save</button>
+        <a class="btn btn-secondary" th:href="@{/clients}">Cancel</a>
+    </form>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<script>
+    (function () {
+        document.querySelectorAll('.needs-validation').forEach(function (f) {
+            f.addEventListener('submit', function (e) {
+                if (!f.checkValidity()) { e.preventDefault(); e.stopPropagation(); }
+                f.classList.add('was-validated');
+            });
+        });
+    })();
+</script>
+</body>
+</html>

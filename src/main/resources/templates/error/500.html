@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Server Error')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container py-5 text-center">
+    <h1 class="display-1 text-danger">500</h1>
+    <h2 class="mb-3">Internal server error</h2>
+    <p class="lead text-muted">Something went wrong on our side. Please try again later.</p>
+    <a class="btn btn-primary mt-3" th:href="@{/}">Back to dashboard</a>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

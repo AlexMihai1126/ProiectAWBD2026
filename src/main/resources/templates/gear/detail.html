@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Gear item')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<div th:replace="~{fragments/layout :: flash}"></div>
+<main class="container py-4">
+    <h1 class="h3 mb-3"><span th:text="${gear.brand}">Brand</span> <span th:text="${gear.model}">Model</span></h1>
+    <dl class="row">
+        <dt class="col-sm-3">Type</dt><dd class="col-sm-9" th:text="${gear.type}">-</dd>
+        <dt class="col-sm-3">Owner</dt><dd class="col-sm-9" th:text="${gear.ownerUsername}">-</dd>
+        <dt class="col-sm-3">Notes</dt><dd class="col-sm-9" th:text="${gear.notes}">-</dd>
+    </dl>
+    <a class="btn btn-outline-primary" th:href="@{/gear/{id}/edit(id=${gear.id})}">Edit</a>
+    <a class="btn btn-secondary" th:href="@{/gear}">Back to list</a>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

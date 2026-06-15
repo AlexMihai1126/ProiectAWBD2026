@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Invoice form')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container py-4">
+    <h1 class="h3 mb-3" th:text="${editId != null} ? 'Edit invoice' : 'Create invoice'">Invoice</h1>
+
+    <form th:action="${editId != null} ? @{/shoots/{sid}/invoice/edit(sid=${shootId})} : @{/shoots/{sid}/invoice(sid=${shootId})}"
+          th:object="${form}" method="post" class="needs-validation" novalidate>
+        <div class="row">
+            <div class="mb-3 col-md-6">
+                <label class="form-label" for="clientId">Client *</label>
+                <select class="form-select" th:classappend="${#fields.hasErrors('clientId')} ? 'is-invalid'"
+                        id="clientId" th:field="*{clientId}" required>
+                    <option value="">-- select --</option>
+                    <option th:each="c : ${clients}" th:value="${c.id}" th:text="${c.name}">client</option>
+                </select>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('clientId')}" th:errors="*{clientId}">err</div>
+            </div>
+            <div class="mb-3 col-md-6">
+                <label class="form-label" for="amount">Amount *</label>
+                <input class="form-control" th:classappend="${#fields.hasErrors('amount')} ? 'is-invalid'"
+                       id="amount" type="number" step="0.01" min="0" th:field="*{amount}" required>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}">err</div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="mb-3 col-md-4">
+                <label class="form-label" for="paymentMethod">Payment method *</label>
+                <select class="form-select" th:classappend="${#fields.hasErrors('paymentMethod')} ? 'is-invalid'"
+                        id="paymentMethod" th:field="*{paymentMethod}" required>
+                    <option value="">-- select --</option>
+                    <option th:each="p : ${paymentTypes}" th:value="${p}" th:text="${p}">PAYMENT</option>
+                </select>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('paymentMethod')}" th:errors="*{paymentMethod}">err</div>
+            </div>
+            <div class="mb-3 col-md-4">
+                <label class="form-label" for="status">Status</label>
+                <select class="form-select" id="status" th:field="*{status}">
+                    <option value="">(default)</option>
+                    <option th:each="s : ${invoiceStatuses}" th:value="${s}" th:text="${s}">STATUS</option>
+                </select>
+            </div>
+            <div class="mb-3 col-md-4">
+                <label class="form-label" for="paidAt">Paid at</label>
+                <input class="form-control" id="paidAt" name="paidAt" type="datetime-local"
+                       th:value="${form.paidAt != null} ? ${#temporals.format(form.paidAt, 'yyyy-MM-dd''T''HH:mm')} : ''">
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="details">Details</label>
+            <textarea class="form-control" id="details" rows="2" th:field="*{details}" maxlength="1000"></textarea>
+        </div>
+        <button class="btn btn-primary" type="submit">Save</button>
+        <a class="btn btn-secondary" th:href="@{/shoots/{id}(id=${shootId})}">Cancel</a>
+    </form>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<script>
+    (function () {
+        document.querySelectorAll('.needs-validation').forEach(function (f) {
+            f.addEventListener('submit', function (e) {
+                if (!f.checkValidity()) { e.preventDefault(); e.stopPropagation(); }
+                f.classList.add('was-validated');
+            });
+        });
+    })();
+</script>
+</body>
+</html>

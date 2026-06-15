@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Client')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<div th:replace="~{fragments/layout :: flash}"></div>
+<main class="container py-4">
+    <h1 class="h3 mb-3" th:text="${client.name}">Client</h1>
+    <dl class="row">
+        <dt class="col-sm-3">Email</dt><dd class="col-sm-9" th:text="${client.email}">-</dd>
+        <dt class="col-sm-3">Phone</dt><dd class="col-sm-9" th:text="${client.phone}">-</dd>
+        <dt class="col-sm-3">Notes</dt><dd class="col-sm-9" th:text="${client.notes}">-</dd>
+    </dl>
+    <a class="btn btn-outline-primary" th:href="@{/clients/{id}/edit(id=${client.id})}">Edit</a>
+    <a class="btn btn-secondary" th:href="@{/clients}">Back to list</a>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

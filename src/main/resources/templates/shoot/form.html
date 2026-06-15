@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Shoot form')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container py-4">
+    <h1 class="h3 mb-3" th:text="${editId != null} ? 'Edit shoot' : 'New shoot'">Shoot</h1>
+
+    <form th:action="${editId != null} ? @{/shoots/{id}(id=${editId})} : @{/shoots}"
+          th:object="${form}" method="post" class="needs-validation" novalidate>
+        <div class="mb-3">
+            <label class="form-label" for="title">Title *</label>
+            <input class="form-control" th:classappend="${#fields.hasErrors('title')} ? 'is-invalid'"
+                   id="title" type="text" th:field="*{title}" required>
+            <div class="invalid-feedback" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">err</div>
+        </div>
+
+        <div class="row">
+            <div class="mb-3 col-md-6">
+                <label class="form-label" for="startAt">Start *</label>
+                <input class="form-control" th:classappend="${#fields.hasErrors('startAt')} ? 'is-invalid'"
+                       id="startAt" name="startAt" type="datetime-local" required
+                       th:value="${form.startAt != null} ? ${#temporals.format(form.startAt, 'yyyy-MM-dd''T''HH:mm')} : ''">
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('startAt')}" th:errors="*{startAt}">err</div>
+            </div>
+            <div class="mb-3 col-md-6">
+                <label class="form-label" for="endAt">End</label>
+                <input class="form-control" id="endAt" name="endAt" type="datetime-local"
+                       th:value="${form.endAt != null} ? ${#temporals.format(form.endAt, 'yyyy-MM-dd''T''HH:mm')} : ''">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="mb-3 col-md-4">
+                <label class="form-label" for="status">Status</label>
+                <select class="form-select" id="status" th:field="*{status}">
+                    <option th:each="st : ${statuses}" th:value="${st}" th:text="${st}">STATUS</option>
+                </select>
+            </div>
+            <div class="mb-3 col-md-4">
+                <label class="form-label" for="ownerId">Photographer *</label>
+                <select class="form-select" th:classappend="${#fields.hasErrors('ownerId')} ? 'is-invalid'"
+                        id="ownerId" th:field="*{ownerId}" required>
+                    <option value="">-- select --</option>
+                    <option th:each="u : ${users}" th:value="${u.id}" th:text="${u.username}">user</option>
+                </select>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('ownerId')}" th:errors="*{ownerId}">err</div>
+            </div>
+            <div class="mb-3 col-md-4">
+                <label class="form-label" for="locationId">Location *</label>
+                <select class="form-select" th:classappend="${#fields.hasErrors('locationId')} ? 'is-invalid'"
+                        id="locationId" th:field="*{locationId}" required>
+                    <option value="">-- select --</option>
+                    <option th:each="l : ${locations}" th:value="${l.id}" th:text="${l.name}">location</option>
+                </select>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('locationId')}" th:errors="*{locationId}">err</div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="gearItemIds">Gear (hold Ctrl/Cmd to select multiple)</label>
+            <select class="form-select" id="gearItemIds" th:field="*{gearItemIds}" multiple size="5">
+                <option th:each="g : ${gearItems}" th:value="${g.id}"
+                        th:text="${g.brand} + ' ' + ${g.model} + ' (' + ${g.type} + ')'">gear</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="notes">Notes</label>
+            <textarea class="form-control" id="notes" rows="3" th:field="*{notes}" maxlength="2000"></textarea>
+        </div>
+
+        <button class="btn btn-primary" type="submit">Save</button>
+        <a class="btn btn-secondary" th:href="@{/shoots}">Cancel</a>
+    </form>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<script>
+    (function () {
+        document.querySelectorAll('.needs-validation').forEach(function (f) {
+            f.addEventListener('submit', function (e) {
+                if (!f.checkValidity()) { e.preventDefault(); e.stopPropagation(); }
+                f.classList.add('was-validated');
+            });
+        });
+    })();
+</script>
+</body>
+</html>

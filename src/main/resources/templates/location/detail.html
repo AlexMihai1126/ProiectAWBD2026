@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Location')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<div th:replace="~{fragments/layout :: flash}"></div>
+<main class="container py-4">
+    <h1 class="h3 mb-3" th:text="${location.name}">Location</h1>
+    <dl class="row">
+        <dt class="col-sm-3">County</dt><dd class="col-sm-9" th:text="${location.county}">-</dd>
+        <dt class="col-sm-3">Country</dt><dd class="col-sm-9" th:text="${location.country}">-</dd>
+        <dt class="col-sm-3">Latitude</dt><dd class="col-sm-9" th:text="${location.latitude}">-</dd>
+        <dt class="col-sm-3">Longitude</dt><dd class="col-sm-9" th:text="${location.longitude}">-</dd>
+    </dl>
+    <a class="btn btn-outline-primary" th:href="@{/locations/{id}/edit(id=${location.id})}">Edit</a>
+    <a class="btn btn-secondary" th:href="@{/locations}">Back to list</a>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

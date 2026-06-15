@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Shoot')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<div th:replace="~{fragments/layout :: flash}"></div>
+<main class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0" th:text="${shoot.title}">Shoot</h1>
+        <div>
+            <a class="btn btn-outline-primary" th:href="@{/shoots/{id}/edit(id=${shoot.id})}">Edit</a>
+            <a class="btn btn-secondary" th:href="@{/shoots}">Back</a>
+        </div>
+    </div>
+
+    <dl class="row">
+        <dt class="col-sm-3">Status</dt>
+        <dd class="col-sm-9"><span class="badge bg-secondary" th:text="${shoot.status}">STATUS</span></dd>
+        <dt class="col-sm-3">Start</dt>
+        <dd class="col-sm-9" th:text="${shoot.startAt != null} ? ${#temporals.format(shoot.startAt, 'yyyy-MM-dd HH:mm')} : ''">-</dd>
+        <dt class="col-sm-3">End</dt>
+        <dd class="col-sm-9" th:text="${shoot.endAt != null} ? ${#temporals.format(shoot.endAt, 'yyyy-MM-dd HH:mm')} : ''">-</dd>
+        <dt class="col-sm-3">Photographer</dt><dd class="col-sm-9" th:text="${shoot.ownerUsername}">-</dd>
+        <dt class="col-sm-3">Location</dt><dd class="col-sm-9" th:text="${shoot.locationName}">-</dd>
+        <dt class="col-sm-3">Gear items</dt><dd class="col-sm-9" th:text="${#sets.size(shoot.gearItemIds)} + ' assigned'">-</dd>
+        <dt class="col-sm-3">Notes</dt><dd class="col-sm-9" th:text="${shoot.notes}">-</dd>
+    </dl>
+
+    <!-- Media -->
+    <div class="d-flex justify-content-between align-items-center mt-4 mb-2">
+        <h2 class="h5 mb-0">Media</h2>
+        <a class="btn btn-sm btn-success" th:href="@{/shoots/{id}/media/new(id=${shoot.id})}">Add media</a>
+    </div>
+    <div th:if="${#lists.isEmpty(media)}" class="alert alert-light border">No media attached.</div>
+    <table th:if="${not #lists.isEmpty(media)}" class="table table-sm table-striped align-middle">
+        <thead>
+        <tr><th>Type</th><th>File</th><th>Rating</th><th>Taken at</th><th class="text-end">Actions</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="m : ${media}">
+            <td th:text="${m.mediaType}">type</td>
+            <td th:text="${m.fileRef}">file</td>
+            <td th:text="${m.rating}">-</td>
+            <td th:text="${m.takenAt != null} ? ${#temporals.format(m.takenAt, 'yyyy-MM-dd HH:mm')} : ''">-</td>
+            <td class="text-end">
+                <a class="btn btn-sm btn-outline-primary"
+                   th:href="@{/shoots/{sid}/media/{mid}/edit(sid=${shoot.id}, mid=${m.id})}">Edit</a>
+                <form class="d-inline" th:action="@{/shoots/{sid}/media/{mid}/delete(sid=${shoot.id}, mid=${m.id})}"
+                      method="post" onsubmit="return confirm('Delete this media?');">
+                    <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- Invoice -->
+    <div class="d-flex justify-content-between align-items-center mt-4 mb-2">
+        <h2 class="h5 mb-0">Invoice</h2>
+        <a th:if="${!hasInvoice}" class="btn btn-sm btn-success"
+           th:href="@{/shoots/{id}/invoice/new(id=${shoot.id})}">Create invoice</a>
+    </div>
+    <div th:if="${!hasInvoice}" class="alert alert-light border">No invoice yet.</div>
+    <div th:if="${hasInvoice}" class="card">
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Client</dt><dd class="col-sm-9" th:text="${invoice.clientName}">-</dd>
+                <dt class="col-sm-3">Amount</dt><dd class="col-sm-9" th:text="${invoice.amount}">-</dd>
+                <dt class="col-sm-3">Status</dt>
+                <dd class="col-sm-9"><span class="badge bg-info text-dark" th:text="${invoice.status}">STATUS</span></dd>
+                <dt class="col-sm-3">Payment</dt><dd class="col-sm-9" th:text="${invoice.paymentMethod}">-</dd>
+                <dt class="col-sm-3">Paid at</dt>
+                <dd class="col-sm-9" th:text="${invoice.paidAt != null} ? ${#temporals.format(invoice.paidAt, 'yyyy-MM-dd HH:mm')} : ''">-</dd>
+                <dt class="col-sm-3">Details</dt><dd class="col-sm-9" th:text="${invoice.details}">-</dd>
+            </dl>
+            <div class="mt-3">
+                <a class="btn btn-sm btn-outline-primary" th:href="@{/shoots/{id}/invoice/edit(id=${shoot.id})}">Edit</a>
+                <form class="d-inline" th:action="@{/shoots/{id}/invoice/delete(id=${shoot.id})}" method="post"
+                      onsubmit="return confirm('Delete this invoice?');">
+                    <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>
