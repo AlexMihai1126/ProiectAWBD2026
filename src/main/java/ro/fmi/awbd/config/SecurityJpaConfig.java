@@ -4,6 +4,7 @@ import ro.fmi.awbd.service.security.JpaUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,10 +13,6 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @Profile("postgresql")
 public class SecurityJpaConfig {
-    @Bean
-    PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 
     private final JpaUserDetailsService userDetailsService;
 
@@ -24,22 +21,35 @@ public class SecurityJpaConfig {
     }
 
     @Bean
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/webjars/**", "/login", "/resources/**").permitAll()
+                        .requestMatchers("/", "/login", "/perform_login", "/logout",
+                                "/webjars/**", "/css/**", "/js/**", "/error").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/*/new", "/*/*/edit",
+                                "/shoots/*/media/**", "/shoots/*/invoice/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .userDetailsService(userDetailsService)
-                .formLogin(formLogin ->
-                        formLogin
-                                .loginPage("/login")
-                                .permitAll()
-                                .loginProcessingUrl("/perform_login")
-                )
-                .exceptionHandling(
-                        ex -> ex.accessDeniedPage("/access_denied"))
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .permitAll()
+                        .loginProcessingUrl("/perform_login"))
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout")
+                        .permitAll())
+                .rememberMe(remember -> remember
+                        .key("awbd-remember-me-key")
+                        .tokenValiditySeconds(7 * 24 * 60 * 60)
+                        .userDetailsService(userDetailsService))
+                .exceptionHandling(ex -> ex.accessDeniedPage("/access_denied"))
                 .build();
     }
-
 }
