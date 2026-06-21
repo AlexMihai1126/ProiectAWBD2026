@@ -29,7 +29,7 @@ public class SecurityJpaConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/perform_login", "/logout",
+                        .requestMatchers("/", "/login", "/perform_login", "/logout", "/access_denied",
                                 "/webjars/**", "/css/**", "/js/**", "/error").permitAll()
                         .requestMatchers(HttpMethod.GET, "/*/new", "/*/*/edit",
                                 "/shoots/*/media/**", "/shoots/*/invoice/**").hasRole("ADMIN")

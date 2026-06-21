@@ -12,7 +12,7 @@ import ro.fmi.awbd.repository.security.UserRepository;
 
 @AllArgsConstructor
 @Component
-@Profile("postgresql")
+@Profile({"h2", "postgresql"})
 public class DataLoader implements CommandLineRunner {
 
     private AuthorityRepository authorityRepository;
@@ -26,13 +26,13 @@ public class DataLoader implements CommandLineRunner {
 
             User admin = User.builder()
                     .username("admin")
-                    .password(passwordEncoder.encode("12345"))
+                    .password(passwordEncoder.encode("admin"))
                     .authority(adminRole)
                     .build();
 
             User guest = User.builder()
                     .username("guest")
-                    .password(passwordEncoder.encode("12345"))
+                    .password(passwordEncoder.encode("guest"))
                     .authority(guestRole)
                     .build();
 
