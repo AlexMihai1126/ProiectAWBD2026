@@ -1,6 +1,7 @@
 package ro.fmi.awbd;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,6 +14,7 @@ import ro.fmi.awbd.repository.security.UserRepository;
 @AllArgsConstructor
 @Component
 @Profile({"h2", "postgresql"})
+@Slf4j
 public class DataLoader implements CommandLineRunner {
 
     private AuthorityRepository authorityRepository;
@@ -38,6 +40,9 @@ public class DataLoader implements CommandLineRunner {
 
             userRepository.save(admin);
             userRepository.save(guest);
+            log.info("Seeded default users: admin (ADMIN), guest (GUEST)");
+        } else {
+            log.debug("User seed skipped, {} users already in database", userRepository.count());
         }
     }
 

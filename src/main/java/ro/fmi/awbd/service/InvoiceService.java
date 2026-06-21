@@ -30,6 +30,7 @@ public class InvoiceService {
 
     @Transactional(readOnly = true)
     public InvoiceResponse getInvoice(Long shootId) {
+        log.debug("Fetching invoice for shoot id={}", shootId);
         InvoiceEntity invoice = invoiceRepository.findByShootId(shootId)
                 .orElseThrow(() -> new ResourceNotFoundException("Invoice not found for shoot " + shootId));
         return invoiceMapper.toResponse(invoice);
@@ -37,7 +38,9 @@ public class InvoiceService {
 
     @Transactional(readOnly = true)
     public boolean existsForShoot(Long shootId) {
-        return invoiceRepository.findByShootId(shootId).isPresent();
+        boolean exists = invoiceRepository.findByShootId(shootId).isPresent();
+        log.debug("Invoice exists for shoot id={}: {}", shootId, exists);
+        return exists;
     }
 
     @Transactional
@@ -46,6 +49,7 @@ public class InvoiceService {
                 .orElseThrow(() -> ResourceNotFoundException.of("Shoot", shootId));
 
         if (invoiceRepository.findByShootId(shootId).isPresent()) {
+            log.warn("Duplicate invoice creation attempted for shoot id={}", shootId);
             throw new DuplicateResourceException("Invoice already exists for shoot " + shootId);
         }
 

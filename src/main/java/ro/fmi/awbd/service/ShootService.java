@@ -38,16 +38,22 @@ public class ShootService {
 
     @Transactional(readOnly = true)
     public List<ShootListItemResponse> getAllShoots() {
-        return shootRepository.findAll().stream().map(shootMapper::toListItemResponse).toList();
+        List<ShootListItemResponse> shoots = shootRepository.findAll().stream().map(shootMapper::toListItemResponse).toList();
+        log.debug("Listed all shoots, count={}", shoots.size());
+        return shoots;
     }
 
     @Transactional(readOnly = true)
     public Page<ShootListItemResponse> getShoots(Pageable pageable) {
-        return shootRepository.findAll(pageable).map(shootMapper::toListItemResponse);
+        Page<ShootListItemResponse> page = shootRepository.findAll(pageable).map(shootMapper::toListItemResponse);
+        log.debug("Listed shoots page={}, size={}, total={}",
+                pageable.getPageNumber(), pageable.getPageSize(), page.getTotalElements());
+        return page;
     }
 
     @Transactional(readOnly = true)
     public ShootResponse getShootById(Long shootId) {
+        log.debug("Fetching shoot id={}", shootId);
         return shootMapper.toResponse(findEntity(shootId));
     }
 
@@ -56,9 +62,11 @@ public class ShootService {
         if (!userRepository.existsById(ownerId)) {
             throw ResourceNotFoundException.of("Owner user", ownerId);
         }
-        return shootRepository.findByOwnerId(ownerId).stream()
+        List<ShootListItemResponse> shoots = shootRepository.findByOwnerId(ownerId).stream()
                 .map(shootMapper::toListItemResponse)
                 .toList();
+        log.debug("Listed {} shoots for owner id={}", shoots.size(), ownerId);
+        return shoots;
     }
 
     @Transactional

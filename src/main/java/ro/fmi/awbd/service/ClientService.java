@@ -26,16 +26,22 @@ public class ClientService {
 
     @Transactional(readOnly = true)
     public List<ClientResponse> getAllClients() {
-        return clientRepository.findAll().stream().map(clientMapper::toResponse).toList();
+        List<ClientResponse> clients = clientRepository.findAll().stream().map(clientMapper::toResponse).toList();
+        log.debug("Listed all clients, count={}", clients.size());
+        return clients;
     }
 
     @Transactional(readOnly = true)
     public Page<ClientResponse> getClients(Pageable pageable) {
-        return clientRepository.findAll(pageable).map(clientMapper::toResponse);
+        Page<ClientResponse> page = clientRepository.findAll(pageable).map(clientMapper::toResponse);
+        log.debug("Listed clients page={}, size={}, total={}",
+                pageable.getPageNumber(), pageable.getPageSize(), page.getTotalElements());
+        return page;
     }
 
     @Transactional(readOnly = true)
     public ClientResponse getClient(Long id) {
+        log.debug("Fetching client id={}", id);
         return clientMapper.toResponse(findEntity(id));
     }
 

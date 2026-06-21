@@ -217,6 +217,20 @@ Pagina de login: http://localhost:8080/login
 
 Utilizatorii neautorizați pentru o acțiune sunt redirecționați către `/access_denied` (403).
 
+## Logging
+
+Aplicația folosește **SLF4J** cu **Logback** (`logback-spring.xml`).
+
+| Destinație | Nivel | Fișier |
+|------------|-------|--------|
+| Consolă | INFO | — |
+| Jurnal general | INFO | `logs/app.log` |
+| Erori | ERROR | `logs/error.log` |
+
+În profilul `h2`, pachetul `ro.fmi.awbd` este la nivel **DEBUG** (citiri, autentificare, seed). Operațiile CRUD din servicii sunt logate la **INFO**; erorile de business la **WARN**, excepțiile neașteptate la **ERROR**.
+
+Directorul `logs/` este creat automat la pornire. Poți schimba locația cu variabila de mediu `LOG_PATH`.
+
 ## Teste
 
 ```bash
@@ -251,5 +265,6 @@ src/main/resources/
 ├── schema-postgres.sql
 ├── application-h2.properties
 ├── application-postgresql.properties
+├── logback-spring.xml
 └── templates/        # Thymeleaf
 ```
