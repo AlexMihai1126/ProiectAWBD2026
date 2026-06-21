@@ -11,7 +11,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import ro.fmi.awbd.service.security.JpaUserDetailsService;
 
 @Configuration
-@Profile("!postgresql")
+@Profile("test")
 public class SecurityH2Config {
 
     private final JpaUserDetailsService userDetailsService;

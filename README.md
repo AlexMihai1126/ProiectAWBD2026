@@ -151,12 +151,14 @@ erDiagram
 
 ## Medii și profiluri Spring
 
+Conform cerinței proiectului (Lab 2): **2 profiluri Spring** cu **2 baze de date diferite** și fișiere de configurare separate.
 
-| Profil       | Bază de date        | Utilizare                    |
-| ------------ | ------------------- | ---------------------------- |
-| `h2`         | H2 in-memory        | Dezvoltare și testare rapidă |
-| `postgresql` | PostgreSQL (Docker) | Mediu apropiat de producție  |
+| Profil | Fișier | Bază de date | Utilizare |
+|--------|--------|--------------|-----------|
+| `test` | `application-test.yml` | H2 in-memory | Testare automată și rulare rapidă locală |
+| `dev` | `application-dev.yml` | PostgreSQL 16 (Docker) | Dezvoltare / mediu apropiat de producție |
 
+Profilul implicit la pornire (fără argumente): **`test`**.
 
 Scripturile SQL (`schema-h2.sql`, `schema-postgres.sql`) creează schema la pornire. `DataLoader` inserează utilizatorii impliciți dacă baza este goală.
 
@@ -164,20 +166,26 @@ Scripturile SQL (`schema-h2.sql`, `schema-postgres.sql`) creează schema la porn
 
 - **JDK 21**
 - **Gradle** (wrapper inclus: `gradlew` / `gradlew.bat`)
-- **Docker** (opțional, doar pentru profilul PostgreSQL)
+- **Docker** (opțional, doar pentru profilul `dev`)
 
 ## Rulare locală
 
-### 1. H2 (recomandat pentru development)
+### 1. Profil `test` — H2 (implicit, fără Docker)
 
 ```bash
-./gradlew bootRun --args='--spring.profiles.active=h2'
+./gradlew bootRun --args='--spring.profiles.active=test'
 ```
 
 Windows (PowerShell):
 
 ```powershell
-.\gradlew.bat bootRun --args="--spring.profiles.active=h2"
+.\gradlew.bat bootRun --args="--spring.profiles.active=test"
+```
+
+Sau simplu (profil implicit):
+
+```powershell
+.\gradlew.bat bootRun
 ```
 
 Aplicația: [http://localhost:8080](http://localhost:8080)
@@ -192,7 +200,7 @@ Consolă H2: [http://localhost:8080/h2-console](http://localhost:8080/h2-console
 | Password | *(gol)*              |
 
 
-### 2. PostgreSQL (Docker)
+### 2. Profil `dev` — PostgreSQL (Docker)
 
 Pornește doar PostgreSQL:
 
@@ -203,7 +211,13 @@ docker compose up -d postgres
 Rulează aplicația:
 
 ```bash
-./gradlew bootRun --args='--spring.profiles.active=postgresql'
+./gradlew bootRun --args='--spring.profiles.active=dev'
+```
+
+Windows (PowerShell):
+
+```powershell
+.\gradlew.bat bootRun --args="--spring.profiles.active=dev"
 ```
 
 Dacă schema este incompletă sau coruptă, resetează volumul:
@@ -217,8 +231,8 @@ docker compose up -d postgres
 
 Configurări incluse în `.run/`:
 
-- `ProiectApplication-H2` — profil `h2`
-- `ProiectApplication-Postgres` — profil `postgresql`
+- `ProiectApplication-Test` — profil `test` (H2)
+- `ProiectApplication-Dev` — profil `dev` (PostgreSQL)
 
 ## Autentificare
 
@@ -311,7 +325,7 @@ Aplicația folosește **SLF4J** cu **Logback** (`logback-spring.xml`).
 | Erori          | ERROR | `logs/error.log` |
 
 
-În profilul `h2`, pachetul `ro.fmi.awbd` este la nivel **DEBUG** (citiri, autentificare, seed). Operațiile CRUD din servicii sunt logate la **INFO**; erorile de business la **WARN**, excepțiile neașteptate la **ERROR**.
+În profilul `test`, pachetul `ro.fmi.awbd` este la nivel **DEBUG** (citiri, autentificare, seed). Operațiile CRUD din servicii sunt logate la **INFO**; erorile de business la **WARN**, excepțiile neașteptate la **ERROR**.
 
 Directorul `logs/` este creat automat la pornire. Poți schimba locația cu variabila de mediu `LOG_PATH`.
 
@@ -322,7 +336,7 @@ Directorul `logs/` este creat automat la pornire. Poți schimba locația cu vari
 ./gradlew jacocoTestReport
 ```
 
-Testele folosesc profilul `h2` cu bază de date in-memory izolată (`jdbc:h2:mem:awbd-${random.uuid}`).
+Testele folosesc profilul `test` cu bază de date in-memory izolată (`jdbc:h2:mem:awbd-${random.uuid}`).
 
 
 | Tip                                       | Locație                                                | Ce verifică                                 |
@@ -355,8 +369,8 @@ src/main/java/ro/fmi/awbd/
 src/main/resources/
 ├── schema-h2.sql
 ├── schema-postgres.sql
-├── application-h2.properties
-├── application-postgresql.properties
+├── application-test.yml
+├── application-dev.yml
 ├── logback-spring.xml
 └── templates/        # Thymeleaf
 ```

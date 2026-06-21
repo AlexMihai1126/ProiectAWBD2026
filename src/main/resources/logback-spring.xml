@@ -43,11 +43,11 @@
         </rollingPolicy>
     </appender>
 
-    <springProfile name="h2">
+    <springProfile name="test">
         <logger name="ro.fmi.awbd" level="DEBUG"/>
     </springProfile>
 
-    <springProfile name="postgresql">
+    <springProfile name="dev">
         <logger name="ro.fmi.awbd" level="INFO"/>
     </springProfile>
 

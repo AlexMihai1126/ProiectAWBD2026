@@ -13,7 +13,7 @@ import ro.fmi.awbd.repository.security.UserRepository;
 
 @AllArgsConstructor
 @Component
-@Profile({"h2", "postgresql"})
+@Profile({"test", "dev"})
 @Slf4j
 public class DataLoader implements CommandLineRunner {
 
