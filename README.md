@@ -235,9 +235,25 @@ Directorul `logs/` este creat automat la pornire. Poți schimba locația cu vari
 
 ```bash
 ./gradlew test
+./gradlew jacocoTestReport
 ```
 
-Testele folosesc profilul `h2` și verifică încărcarea contextului, persistența și regulile de securitate de bază.
+Testele folosesc profilul `h2` cu bază de date in-memory izolată (`jdbc:h2:mem:awbd-${random.uuid}`).
+
+| Tip | Locație | Ce verifică |
+|-----|---------|-------------|
+| **Unit** (Mockito) | `src/test/java/ro/fmi/awbd/service/` | Logică de business pentru toate serviciile |
+| **Integrare** (MockMvc + `@WithMockUser`) | `src/test/java/ro/fmi/awbd/integration/` + smoke tests | Securitate roluri, fluxuri MVC, persistență |
+| **Coverage** | JaCoCo (min. **70%** linii pe servicii) | `./gradlew jacocoTestCoverageVerification` |
+
+Raport HTML coverage: `build/reports/jacoco/test/html/index.html`
+
+### Scenarii integrare (MockMvc)
+
+- Guest poate lista resurse, dar nu poate șterge (`ClientControllerSecurityTest`)
+- Admin poate crea client (`ClientControllerIntegrationTest`)
+- Guest listează ședințe; admin deschide formular nou (`ShootControllerIntegrationTest`)
+- Stats cu și fără interval de timp (`StatsControllerIntegrationTest`)
 
 ## Flux funcțional recomandat (demo)
 
