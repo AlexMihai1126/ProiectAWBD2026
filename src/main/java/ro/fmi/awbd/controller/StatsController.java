@@ -26,7 +26,12 @@ public class StatsController {
         model.addAttribute("from", from);
         model.addAttribute("to", to);
         if (from != null) {
-            model.addAttribute("stats", statsService.getStats(from, to));
+            OffsetDateTime toDate = to != null ? to : OffsetDateTime.now();
+            if (from.isAfter(toDate)) {
+                model.addAttribute("statsError", "Interval invalid: data de început trebuie să fie înainte de data de sfârșit.");
+            } else {
+                model.addAttribute("stats", statsService.getStats(from, to));
+            }
         }
         return "stats/index";
     }

@@ -7,6 +7,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import ro.fmi.awbd.support.IntegrationTest;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
@@ -26,11 +27,12 @@ class StatsControllerIntegrationTest {
 
     @Test
     @WithMockUser(username = "admin", roles = "ADMIN")
-    void adminCanQueryStats() throws Exception {
+    void adminSeesErrorWhenFromIsAfterTo() throws Exception {
         mockMvc.perform(get("/stats")
-                        .param("from", "2026-01-01T00:00:00Z")
-                        .param("to", "2026-12-31T23:59:59Z"))
+                        .param("from", "2026-12-31T23:59:59Z")
+                        .param("to", "2026-01-01T00:00:00Z"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("stats/index"));
+                .andExpect(view().name("stats/index"))
+                .andExpect(model().attributeExists("statsError"));
     }
 }

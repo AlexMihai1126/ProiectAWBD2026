@@ -6,7 +6,9 @@
 <main class="container py-4">
     <h1 class="h3 mb-3">Statistics</h1>
 
-    <form th:action="@{/stats}" method="get" class="row g-3 align-items-end mb-4">
+    <div th:if="${statsError}" class="alert alert-danger" role="alert" th:text="${statsError}">Invalid range</div>
+
+    <form th:action="@{/stats}" method="get" class="row g-3 align-items-end mb-4 needs-validation" novalidate>
         <div class="col-md-4">
             <label class="form-label" for="from">From *</label>
             <input class="form-control" id="from" name="from" type="datetime-local" required
@@ -50,5 +52,15 @@
     </div>
 </main>
 <footer th:replace="~{fragments/layout :: footer}"></footer>
+<script>
+    (function () {
+        document.querySelectorAll('.needs-validation').forEach(function (f) {
+            f.addEventListener('submit', function (e) {
+                if (!f.checkValidity()) { e.preventDefault(); e.stopPropagation(); }
+                f.classList.add('was-validated');
+            });
+        });
+    })();
+</script>
 </body>
 </html>

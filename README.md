@@ -17,20 +17,22 @@ Aplicație web monolitică Spring Boot pentru planificarea ședințelor foto/vid
 
 ## Tehnologii
 
-| Layer | Tehnologie |
-|-------|------------|
-| Backend | Spring Boot 4, Java 21, Spring MVC |
-| Persistență | Spring Data JPA, Hibernate |
-| Baze de date | H2 (in-memory), PostgreSQL 16 |
-| Securitate | Spring Security, BCrypt, roluri ADMIN / GUEST |
-| UI | Thymeleaf, Bootstrap 5 (WebJars) |
-| Mapping | MapStruct, Bean Validation |
-| Build | Gradle |
-| Containere | Docker Compose (PostgreSQL) |
+
+| Layer        | Tehnologie                                    |
+| ------------ | --------------------------------------------- |
+| Backend      | Spring Boot 4, Java 21, Spring MVC            |
+| Persistență  | Spring Data JPA, Hibernate                    |
+| Baze de date | H2 (in-memory), PostgreSQL 16                 |
+| Securitate   | Spring Security, BCrypt, roluri ADMIN / GUEST |
+| UI           | Thymeleaf, Bootstrap 5 (WebJars)              |
+| Mapping      | MapStruct, Bean Validation                    |
+| Build        | Gradle                                        |
+| Containere   | Docker Compose (PostgreSQL)                   |
+
 
 ## Arhitectură
 
-Aplicația urmează o arhitectură în straturi (conform laboratoarelor AWBD):
+Aplicația urmează o arhitectură în straturi:
 
 ```
 Browser (Thymeleaf)
@@ -48,38 +50,44 @@ DTO-urile (`request` / `response`) și mapper-ele MapStruct separă entitățile
 
 ### Pachete principale
 
-| Pachet | Rol |
-|--------|-----|
-| `controller` | Endpoints MVC |
-| `service` | Business logic |
-| `repository` | Acces la date |
-| `model.entity` | Entități JPA |
-| `model.dto` | Formulare și răspunsuri |
-| `config` | Security, Web, profiluri |
-| `exception` | Excepții custom + `GlobalExceptionHandler` |
+
+| Pachet         | Rol                                        |
+| -------------- | ------------------------------------------ |
+| `controller`   | Endpoints MVC                              |
+| `service`      | Business logic                             |
+| `repository`   | Acces la date                              |
+| `model.entity` | Entități JPA                               |
+| `model.dto`    | Formulare și răspunsuri                    |
+| `config`       | Security, Web, profiluri                   |
+| `exception`    | Excepții custom + `GlobalExceptionHandler` |
+
 
 ## Model de date (ER)
 
 ### Entități (8)
 
-| Entitate | Descriere |
-|----------|-----------|
-| `User` | Utilizator autentificat (fotograf / admin) |
-| `Authority` | Rol (`ROLE_ADMIN`, `ROLE_GUEST`) |
-| `Client` | Client al firmei |
-| `Location` | Locație de shoot (cu geolocație opțională) |
-| `GearItem` | Echipament foto deținut de un fotograf |
-| `Shoot` | Ședință foto/video |
-| `Media` | Metadata media atașată unei ședințe |
-| `Invoice` | Factură pentru o ședință |
+
+| Entitate    | Descriere                                  |
+| ----------- | ------------------------------------------ |
+| `User`      | Utilizator autentificat (fotograf / admin) |
+| `Authority` | Rol (`ROLE_ADMIN`, `ROLE_GUEST`)           |
+| `Client`    | Client al firmei                           |
+| `Location`  | Locație de shoot (cu geolocație opțională) |
+| `GearItem`  | Echipament foto deținut de un fotograf     |
+| `Shoot`     | Ședință foto/video                         |
+| `Media`     | Metadata media atașată unei ședințe        |
+| `Invoice`   | Factură pentru o ședință                   |
+
 
 ### Relații JPA
 
-| Tip | Relație |
-|-----|---------|
-| `@OneToOne` | `Shoot` ↔ `Invoice` |
+
+| Tip                         | Relație                                                                                                         |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `@OneToOne`                 | `Shoot` ↔ `Invoice`                                                                                             |
 | `@OneToMany` / `@ManyToOne` | `Shoot` → `Media`, `Shoot` → `Location`, `Shoot` → `User` (fotograf), `Invoice` → `Client`, `GearItem` → `User` |
-| `@ManyToMany` | `Shoot` ↔ `GearItem`, `User` ↔ `Authority` |
+| `@ManyToMany`               | `Shoot` ↔ `GearItem`, `User` ↔ `Authority`                                                                      |
+
 
 ### Diagramă ER
 
@@ -139,12 +147,16 @@ erDiagram
     }
 ```
 
+
+
 ## Medii și profiluri Spring
 
-| Profil | Bază de date | Utilizare |
-|--------|--------------|-----------|
-| `h2` | H2 in-memory | Dezvoltare și testare rapidă |
-| `postgresql` | PostgreSQL (Docker) | Mediu apropiat de producție |
+
+| Profil       | Bază de date        | Utilizare                    |
+| ------------ | ------------------- | ---------------------------- |
+| `h2`         | H2 in-memory        | Dezvoltare și testare rapidă |
+| `postgresql` | PostgreSQL (Docker) | Mediu apropiat de producție  |
+
 
 Scripturile SQL (`schema-h2.sql`, `schema-postgres.sql`) creează schema la pornire. `DataLoader` inserează utilizatorii impliciți dacă baza este goală.
 
@@ -168,15 +180,17 @@ Windows (PowerShell):
 .\gradlew.bat bootRun --args="--spring.profiles.active=h2"
 ```
 
-Aplicația: http://localhost:8080
+Aplicația: [http://localhost:8080](http://localhost:8080)
 
-Consolă H2: http://localhost:8080/h2-console
+Consolă H2: [http://localhost:8080/h2-console](http://localhost:8080/h2-console)
 
-| Câmp | Valoare |
-|------|---------|
+
+| Câmp     | Valoare              |
+| -------- | -------------------- |
 | JDBC URL | `jdbc:h2:mem:testdb` |
-| User | `sa` |
-| Password | *(gol)* |
+| User     | `sa`                 |
+| Password | *(gol)*              |
+
 
 ### 2. PostgreSQL (Docker)
 
@@ -208,24 +222,94 @@ Configurări incluse în `.run/`:
 
 ## Autentificare
 
-| Utilizator | Parolă | Rol | Drepturi |
-|------------|--------|-----|----------|
-| `admin` | `admin` | ADMIN | CRUD complet |
-| `guest` | `guest` | GUEST | Doar vizualizare (liste și detalii) |
 
-Pagina de login: http://localhost:8080/login
+| Utilizator | Parolă  | Rol   | Drepturi                            |
+| ---------- | ------- | ----- | ----------------------------------- |
+| `admin`    | `admin` | ADMIN | CRUD complet                        |
+| `guest`    | `guest` | GUEST | Doar vizualizare (liste și detalii) |
+
+
+Pagina de login: [http://localhost:8080/login](http://localhost:8080/login)
 
 Utilizatorii neautorizați pentru o acțiune sunt redirecționați către `/access_denied` (403).
+
+## Validare și gestionarea erorilor
+
+### Validare formulare (server + client)
+
+
+| Mecanism                                                         | Unde                                                       |
+| ---------------------------------------------------------------- | ---------------------------------------------------------- |
+| **Bean Validation** (`@NotBlank`, `@NotNull`, `@Email`, `@Size`) | DTO-uri în `model/dto/request/`                            |
+| `**@Valid` + `BindingResult`**                                   | Controllere CRUD — la erori se reafișează formularul       |
+| `**th:errors` + `is-invalid`**                                   | Template-uri Thymeleaf (`client/form`, `shoot/form`, etc.) |
+| **Bootstrap `needs-validation`**                                 | Validare HTML5 în browser înainte de submit                |
+
+
+Exemplu: la creare client fără nume, mesajul de eroare apare lângă câmp; email invalid este respins de `@Email`.
+
+### Pagini și handler-e de eroare
+
+
+| Situație                                          | HTTP | View                |
+| ------------------------------------------------- | ---- | ------------------- |
+| Resursă inexistentă (`ResourceNotFoundException`) | 404  | `error/error.html`  |
+| URL invalid / resursă statică lipsă               | 404  | `error/404.html`    |
+| Parametru invalid în URL                          | 400  | `error/error.html`  |
+| Conflict business / integritate DB                | 409  | `error/error.html`  |
+| Acces interzis (Spring Security)                  | 403  | `accessDenied.html` |
+| Eroare neașteptată                                | 500  | `error/error.html`  |
+
+
+`GlobalExceptionHandler` (`@ControllerAdvice`) centralizează excepțiile custom (`BadRequestException`, `DuplicateResourceException`, etc.) și loghează la WARN/ERROR.
+
+Pagina **Stats** validează intervalul de timp în controller: dacă `from` este după `to`, se afișează un alert Bootstrap pe aceeași pagină (fără redirect).
+
+## Capturi de ecran
+
+#### 1. Login
+
+[Login page](docs/screenshots/login.png)
+
+#### 2. Dashboard
+
+[Dashboard](docs/screenshots/dashboard.png)
+
+#### 3. Listă clienți
+
+[Lista clienti](docs/screenshots/clients.png)
+
+#### 4. Validare formular
+
+[Validare clienti](docs/screenshots/clientsvalidare.png)
+
+#### 5. Detaliu ședință
+
+[Sedinta](docs/screenshots/sedinta.png)
+
+#### 6. Statistici
+
+[Statistici](docs/screenshots/statistici.png)
+
+#### 7. Vizualizare guest
+
+[Dashboard guest](docs/screenshots/Guests.png)
+
+#### 8. Acces interzis
+
+[Acces interzis](docs/screenshots/forbidden.png)
 
 ## Logging
 
 Aplicația folosește **SLF4J** cu **Logback** (`logback-spring.xml`).
 
-| Destinație | Nivel | Fișier |
-|------------|-------|--------|
-| Consolă | INFO | — |
-| Jurnal general | INFO | `logs/app.log` |
-| Erori | ERROR | `logs/error.log` |
+
+| Destinație     | Nivel | Fișier           |
+| -------------- | ----- | ---------------- |
+| Consolă        | INFO  | —                |
+| Jurnal general | INFO  | `logs/app.log`   |
+| Erori          | ERROR | `logs/error.log` |
+
 
 În profilul `h2`, pachetul `ro.fmi.awbd` este la nivel **DEBUG** (citiri, autentificare, seed). Operațiile CRUD din servicii sunt logate la **INFO**; erorile de business la **WARN**, excepțiile neașteptate la **ERROR**.
 
@@ -240,11 +324,13 @@ Directorul `logs/` este creat automat la pornire. Poți schimba locația cu vari
 
 Testele folosesc profilul `h2` cu bază de date in-memory izolată (`jdbc:h2:mem:awbd-${random.uuid}`).
 
-| Tip | Locație | Ce verifică |
-|-----|---------|-------------|
-| **Unit** (Mockito) | `src/test/java/ro/fmi/awbd/service/` | Logică de business pentru toate serviciile |
+
+| Tip                                       | Locație                                                | Ce verifică                                 |
+| ----------------------------------------- | ------------------------------------------------------ | ------------------------------------------- |
+| **Unit** (Mockito)                        | `src/test/java/ro/fmi/awbd/service/`                   | Logică de business pentru toate serviciile  |
 | **Integrare** (MockMvc + `@WithMockUser`) | `src/test/java/ro/fmi/awbd/integration/` + smoke tests | Securitate roluri, fluxuri MVC, persistență |
-| **Coverage** | JaCoCo (min. **70%** linii pe servicii) | `./gradlew jacocoTestCoverageVerification` |
+| **Coverage**                              | JaCoCo (min. **70%** linii pe servicii)                | `./gradlew jacocoTestCoverageVerification`  |
+
 
 Raport HTML coverage: `build/reports/jacoco/test/html/index.html`
 
@@ -253,17 +339,7 @@ Raport HTML coverage: `build/reports/jacoco/test/html/index.html`
 - Guest poate lista resurse, dar nu poate șterge (`ClientControllerSecurityTest`)
 - Admin poate crea client (`ClientControllerIntegrationTest`)
 - Guest listează ședințe; admin deschide formular nou (`ShootControllerIntegrationTest`)
-- Stats cu și fără interval de timp (`StatsControllerIntegrationTest`)
-
-## Flux funcțional recomandat (demo)
-
-1. Autentificare ca `admin`
-2. Creare **client** și **locație**
-3. Înregistrare **echipament** (cu fotograf)
-4. Creare **ședință** (fotograf + locație + echipament opțional)
-5. Pe pagina ședinței: adăugare **media** și **factură**
-6. Pagina **Stats**: interval de timp pentru venituri și număr ședințe
-7. Autentificare ca `guest` — verificare că butoanele de editare/ștergere nu sunt vizibile
+- Stats cu interval valid și mesaj la interval invalid (`StatsControllerIntegrationTest`)
 
 ## Structură proiect
 
@@ -284,3 +360,4 @@ src/main/resources/
 ├── logback-spring.xml
 └── templates/        # Thymeleaf
 ```
+
