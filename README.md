@@ -23,7 +23,7 @@ Aplicație web monolitică Spring Boot pentru planificarea ședințelor foto/vid
 | Backend      | Spring Boot 4, Java 21, Spring MVC            |
 | Persistență  | Spring Data JPA, Hibernate                    |
 | Baze de date | H2 (in-memory), PostgreSQL 16                 |
-| Securitate   | Spring Security, BCrypt, roluri ADMIN / GUEST |
+| Securitate   | Spring Security, BCrypt, roluri ADMIN / CLIENT |
 | UI           | Thymeleaf, Bootstrap 5 (WebJars)              |
 | Mapping      | MapStruct, Bean Validation                    |
 | Build        | Gradle                                        |
@@ -70,7 +70,7 @@ DTO-urile (`request` / `response`) și mapper-ele MapStruct separă entitățile
 | Entitate    | Descriere                                  |
 | ----------- | ------------------------------------------ |
 | `User`      | Utilizator autentificat (fotograf / admin) |
-| `Authority` | Rol (`ROLE_ADMIN`, `ROLE_GUEST`)           |
+| `Authority` | Rol (`ROLE_ADMIN`, `ROLE_CLIENT`)          |
 | `Client`    | Client al firmei                           |
 | `Location`  | Locație de shoot (cu geolocație opțională) |
 | `GearItem`  | Echipament foto deținut de un fotograf     |
@@ -237,10 +237,12 @@ Configurări incluse în `.run/`:
 ## Autentificare
 
 
-| Utilizator | Parolă  | Rol   | Drepturi                            |
-| ---------- | ------- | ----- | ----------------------------------- |
-| `admin`    | `admin` | ADMIN | CRUD complet                        |
-| `guest`    | `guest` | GUEST | Doar vizualizare (liste și detalii) |
+| Utilizator | Parolă   | Rol    | Drepturi                                      |
+| ---------- | -------- | ------ | --------------------------------------------- |
+| `admin`    | `admin`  | ADMIN  | CRUD complet                                  |
+| `client`   | `client` | CLIENT | Vizualizarea ședințelor proprii               |
+| `client2`  | `client2`| CLIENT | Vizualizarea ședințelor proprii               |
+| `client3`  | `client3`| CLIENT | Vizualizarea ședințelor proprii               |
 
 
 Pagina de login: [http://localhost:8080/login](http://localhost:8080/login)
@@ -305,9 +307,9 @@ Pagina **Stats** validează intervalul de timp în controller: dacă `from` este
 
 [Statistici](docs/screenshots/statistici.png)
 
-#### 7. Vizualizare guest
+#### 7. Vizualizare client
 
-[Dashboard guest](docs/screenshots/Guests.png)
+Clientul autentificat vede doar ședințele asociate profilului său.
 
 #### 8. Acces interzis
 
@@ -374,4 +376,3 @@ src/main/resources/
 ├── logback-spring.xml
 └── templates/        # Thymeleaf
 ```
-
