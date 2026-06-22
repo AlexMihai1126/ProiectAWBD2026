@@ -29,16 +29,22 @@ public class GearService {
 
     @Transactional(readOnly = true)
     public List<GearResponse> getAllGear() {
-        return gearItemRepository.findAll().stream().map(gearMapper::toResponse).toList();
+        List<GearResponse> gear = gearItemRepository.findAll().stream().map(gearMapper::toResponse).toList();
+        log.debug("Listed all gear items, count={}", gear.size());
+        return gear;
     }
 
     @Transactional(readOnly = true)
     public Page<GearResponse> getGear(Pageable pageable) {
-        return gearItemRepository.findAll(pageable).map(gearMapper::toResponse);
+        Page<GearResponse> page = gearItemRepository.findAll(pageable).map(gearMapper::toResponse);
+        log.debug("Listed gear page={}, size={}, total={}",
+                pageable.getPageNumber(), pageable.getPageSize(), page.getTotalElements());
+        return page;
     }
 
     @Transactional(readOnly = true)
     public GearResponse getGearById(Long id) {
+        log.debug("Fetching gear item id={}", id);
         return gearMapper.toResponse(findEntity(id));
     }
 

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/layout :: head('Gear')}"></head>
 <body>
 <nav th:replace="~{fragments/layout :: nav}"></nav>
@@ -7,7 +8,7 @@
 <main class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="h3 mb-0">Gear</h1>
-        <a class="btn btn-success" th:href="@{/gear/new}"><i class="fa-solid fa-plus me-1"></i>New gear item</a>
+        <a class="btn btn-success" sec:authorize="hasRole('ADMIN')" th:href="@{/gear/new}"><i class="fa-solid fa-plus me-1"></i>New gear item</a>
     </div>
 
     <div th:if="${page.totalElements == 0}" class="alert alert-info">No gear yet.</div>
@@ -15,10 +16,8 @@
     <table th:if="${page.totalElements > 0}" class="table table-striped table-hover align-middle">
         <thead>
         <tr>
-            <th><a th:href="@{/gear(sort='brand,asc', size=${page.size})}">Brand</a>
-                / <a th:href="@{/gear(sort='brand,desc', size=${page.size})}">desc</a></th>
-            <th><a th:href="@{/gear(sort='model,asc', size=${page.size})}">Model</a>
-                / <a th:href="@{/gear(sort='model,desc', size=${page.size})}">desc</a></th>
+            <th th:replace="~{fragments/layout :: sortableHeader(${page}, '/gear', 'brand', 'Brand')}"></th>
+            <th th:replace="~{fragments/layout :: sortableHeader(${page}, '/gear', 'model', 'Model')}"></th>
             <th>Type</th>
             <th>Owner</th>
             <th class="text-end">Actions</th>
@@ -30,13 +29,14 @@
             <td th:text="${g.model}">model</td>
             <td th:text="${g.type}">type</td>
             <td th:text="${g.ownerUsername}">owner</td>
-            <td class="text-end">
+            <td class="text-end" sec:authorize="hasRole('ADMIN')">
                 <a class="btn btn-sm btn-outline-primary" th:href="@{/gear/{id}/edit(id=${g.id})}">Edit</a>
                 <form class="d-inline" th:action="@{/gear/{id}/delete(id=${g.id})}" method="post"
                       onsubmit="return confirm('Delete this gear item?');">
                     <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
                 </form>
             </td>
+            <td class="text-end" sec:authorize="!hasRole('ADMIN')"></td>
         </tr>
         </tbody>
     </table>

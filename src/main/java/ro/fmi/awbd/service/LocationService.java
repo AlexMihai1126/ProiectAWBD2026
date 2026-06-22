@@ -26,16 +26,22 @@ public class LocationService {
 
     @Transactional(readOnly = true)
     public List<LocationResponse> getAllLocations() {
-        return locationRepository.findAll().stream().map(locationMapper::toResponse).toList();
+        List<LocationResponse> locations = locationRepository.findAll().stream().map(locationMapper::toResponse).toList();
+        log.debug("Listed all locations, count={}", locations.size());
+        return locations;
     }
 
     @Transactional(readOnly = true)
     public Page<LocationResponse> getLocations(Pageable pageable) {
-        return locationRepository.findAll(pageable).map(locationMapper::toResponse);
+        Page<LocationResponse> page = locationRepository.findAll(pageable).map(locationMapper::toResponse);
+        log.debug("Listed locations page={}, size={}, total={}",
+                pageable.getPageNumber(), pageable.getPageSize(), page.getTotalElements());
+        return page;
     }
 
     @Transactional(readOnly = true)
     public LocationResponse getLocation(Long id) {
+        log.debug("Fetching location id={}", id);
         return locationMapper.toResponse(findEntity(id));
     }
 

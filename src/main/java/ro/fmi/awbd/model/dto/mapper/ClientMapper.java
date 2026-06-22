@@ -15,11 +15,15 @@ import ro.fmi.awbd.model.entity.ClientEntity;
 public interface ClientMapper {
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "user", ignore = true)
     ClientEntity toEntity(ClientCreateRequest request);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "user", ignore = true)
     void updateEntity(ClientUpdateRequest request, @MappingTarget ClientEntity entity);
 
+    @Mapping(target = "userId", source = "user.id")
+    @Mapping(target = "username", source = "user.username")
     ClientResponse toResponse(ClientEntity entity);
 }

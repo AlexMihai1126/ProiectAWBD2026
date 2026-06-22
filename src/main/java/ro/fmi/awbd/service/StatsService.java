@@ -1,6 +1,7 @@
 package ro.fmi.awbd.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ro.fmi.awbd.exception.BadRequestException;
@@ -18,6 +19,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class StatsService {
 
     private final ShootRepository shootRepository;
@@ -52,11 +54,14 @@ public class StatsService {
                 .filter(amount -> amount != null)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        return StatsResponse.builder()
+        StatsResponse stats = StatsResponse.builder()
                 .paidAmount(paid)
                 .receivableAmount(receivable)
                 .plannedShoots(planned)
                 .doneShoots(done)
                 .build();
+        log.info("Computed stats from={} to={} shoots={} planned={} done={} paid={} receivable={}",
+                from, to, shoots.size(), planned, done, paid, receivable);
+        return stats;
     }
 }

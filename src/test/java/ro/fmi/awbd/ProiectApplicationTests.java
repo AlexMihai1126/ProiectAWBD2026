@@ -1,13 +1,12 @@
 package ro.fmi.awbd;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import ro.fmi.awbd.support.IntegrationTest;
 
-@SpringBootTest
+@IntegrationTest
 class ProiectApplicationTests {
 
     @Test
     void contextLoads() {
     }
-
 }

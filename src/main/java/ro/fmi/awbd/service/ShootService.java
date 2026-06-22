@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.transaction.annotation.Transactional;
 import ro.fmi.awbd.exception.ResourceNotFoundException;
 import ro.fmi.awbd.model.dto.mapper.ShootMapper;
@@ -13,10 +14,12 @@ import ro.fmi.awbd.model.dto.request.ShootUpdateRequest;
 import ro.fmi.awbd.model.dto.response.ShootListItemResponse;
 import ro.fmi.awbd.model.dto.response.ShootResponse;
 import ro.fmi.awbd.model.entity.GearItemEntity;
+import ro.fmi.awbd.model.entity.ClientEntity;
 import ro.fmi.awbd.model.entity.LocationEntity;
 import ro.fmi.awbd.model.entity.ShootEntity;
 import ro.fmi.awbd.model.entity.security.User;
 import ro.fmi.awbd.repository.GearItemRepository;
+import ro.fmi.awbd.repository.ClientRepository;
 import ro.fmi.awbd.repository.LocationRepository;
 import ro.fmi.awbd.repository.ShootRepository;
 import ro.fmi.awbd.repository.security.UserRepository;
@@ -34,21 +37,46 @@ public class ShootService {
     private final LocationRepository locationRepository;
     private final GearItemRepository gearItemRepository;
     private final UserRepository userRepository;
+    private final ClientRepository clientRepository;
     private final ShootMapper shootMapper;
 
     @Transactional(readOnly = true)
     public List<ShootListItemResponse> getAllShoots() {
-        return shootRepository.findAll().stream().map(shootMapper::toListItemResponse).toList();
+        List<ShootListItemResponse> shoots = shootRepository.findAll().stream().map(shootMapper::toListItemResponse).toList();
+        log.debug("Listed all shoots, count={}", shoots.size());
+        return shoots;
     }
 
     @Transactional(readOnly = true)
     public Page<ShootListItemResponse> getShoots(Pageable pageable) {
-        return shootRepository.findAll(pageable).map(shootMapper::toListItemResponse);
+        Page<ShootListItemResponse> page = shootRepository.findAll(pageable).map(shootMapper::toListItemResponse);
+        log.debug("Listed shoots page={}, size={}, total={}",
+                pageable.getPageNumber(), pageable.getPageSize(), page.getTotalElements());
+        return page;
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ShootListItemResponse> getShootsForClient(String username, Pageable pageable) {
+        Page<ShootListItemResponse> page = shootRepository.findByClientUserUsername(username, pageable)
+                .map(shootMapper::toListItemResponse);
+        log.debug("Listed shoots for client account={}, total={}", username, page.getTotalElements());
+        return page;
     }
 
     @Transactional(readOnly = true)
     public ShootResponse getShootById(Long shootId) {
+        log.debug("Fetching shoot id={}", shootId);
         return shootMapper.toResponse(findEntity(shootId));
+    }
+
+    @Transactional(readOnly = true)
+    public ShootResponse getShootByIdForClient(Long shootId, String username) {
+        ShootEntity shoot = findEntity(shootId);
+        if (shoot.getClient() == null || shoot.getClient().getUser() == null
+                || !username.equals(shoot.getClient().getUser().getUsername())) {
+            throw new AccessDeniedException("This shoot belongs to another client");
+        }
+        return shootMapper.toResponse(shoot);
     }
 
     @Transactional(readOnly = true)
@@ -56,9 +84,11 @@ public class ShootService {
         if (!userRepository.existsById(ownerId)) {
             throw ResourceNotFoundException.of("Owner user", ownerId);
         }
-        return shootRepository.findByOwnerId(ownerId).stream()
+        List<ShootListItemResponse> shoots = shootRepository.findByOwnerId(ownerId).stream()
                 .map(shootMapper::toListItemResponse)
                 .toList();
+        log.debug("Listed {} shoots for owner id={}", shoots.size(), ownerId);
+        return shoots;
     }
 
     @Transactional
@@ -69,6 +99,7 @@ public class ShootService {
         }
         shoot.setOwner(resolveOwner(request.getOwnerId()));
         shoot.setLocation(resolveLocation(request.getLocationId()));
+        shoot.setClient(resolveClient(request.getClientId()));
         shoot.setGearItems(resolveGearItems(request.getGearItemIds()));
 
         ShootEntity saved = shootRepository.save(shoot);
@@ -86,6 +117,9 @@ public class ShootService {
         }
         if (request.getOwnerId() != null) {
             shoot.setOwner(resolveOwner(request.getOwnerId()));
+        }
+        if (request.getClientId() != null) {
+            shoot.setClient(resolveClient(request.getClientId()));
         }
         if (request.getGearItemIds() != null) {
             shoot.setGearItems(resolveGearItems(request.getGearItemIds()));
@@ -127,5 +161,10 @@ public class ShootService {
     private User resolveOwner(Long ownerId) {
         return userRepository.findById(ownerId)
                 .orElseThrow(() -> ResourceNotFoundException.of("Owner user", ownerId));
+    }
+
+    private ClientEntity resolveClient(Long clientId) {
+        return clientRepository.findById(clientId)
+                .orElseThrow(() -> ResourceNotFoundException.of("Client", clientId));
     }
 }

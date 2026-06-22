@@ -23,6 +23,7 @@ public interface ShootMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "owner", ignore = true)
     @Mapping(target = "location", ignore = true)
+    @Mapping(target = "client", ignore = true)
     @Mapping(target = "gearItems", ignore = true)
     @Mapping(target = "invoice", ignore = true)
     @Mapping(target = "mediaItems", ignore = true)
@@ -34,6 +35,7 @@ public interface ShootMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "owner", ignore = true)
     @Mapping(target = "location", ignore = true)
+    @Mapping(target = "client", ignore = true)
     @Mapping(target = "gearItems", ignore = true)
     @Mapping(target = "invoice", ignore = true)
     @Mapping(target = "mediaItems", ignore = true)
@@ -45,11 +47,14 @@ public interface ShootMapper {
     @Mapping(target = "ownerUsername", source = "owner.username")
     @Mapping(target = "locationId", source = "location.id")
     @Mapping(target = "locationName", source = "location.name")
+    @Mapping(target = "clientId", source = "client.id")
+    @Mapping(target = "clientName", source = "client.name")
     @Mapping(target = "invoiceId", source = "invoice.id")
     @Mapping(target = "gearItemIds", expression = "java(mapGearIds(entity.getGearItems()))")
     ShootResponse toResponse(ShootEntity entity);
 
     @Mapping(target = "locationName", source = "location.name")
+    @Mapping(target = "clientName", source = "client.name")
     ShootListItemResponse toListItemResponse(ShootEntity entity);
 
     default Set<Long> mapGearIds(Set<GearItemEntity> items) {

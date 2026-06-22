@@ -1,0 +1,19 @@
+# Profil dev — PostgreSQL (Lab 2 / cerință proiect)
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/awbd
+    username: awbd
+    password: awbd
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+        format_sql: true
+  sql:
+    init:
+      mode: always
+      platform: postgresql

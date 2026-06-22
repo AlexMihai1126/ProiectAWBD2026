@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Media details')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0">Media details</h1>
+        <div>
+            <a class="btn btn-outline-primary" sec:authorize="hasRole('ADMIN')"
+               th:href="@{/shoots/{sid}/media/{mid}/edit(sid=${shootId}, mid=${media.id})}">Edit</a>
+            <a class="btn btn-secondary" th:href="@{/shoots/{id}(id=${shootId})}">Back to shoot</a>
+        </div>
+    </div>
+
+    <dl class="row">
+        <dt class="col-sm-3">Type</dt><dd class="col-sm-9" th:text="${media.mediaType}">-</dd>
+        <dt class="col-sm-3">File reference</dt><dd class="col-sm-9" th:text="${media.fileRef}">-</dd>
+        <dt class="col-sm-3">Taken at</dt><dd class="col-sm-9" th:text="${@dateTime.formatDisplay(media.takenAt)}">-</dd>
+        <dt class="col-sm-3">Rating</dt><dd class="col-sm-9" th:text="${media.rating}">-</dd>
+        <dt class="col-sm-3">ISO</dt><dd class="col-sm-9" th:text="${media.iso}">-</dd>
+        <dt class="col-sm-3">Aperture</dt><dd class="col-sm-9" th:text="${media.aperture}">-</dd>
+        <dt class="col-sm-3">Shutter speed</dt><dd class="col-sm-9" th:text="${media.shutterSpeed}">-</dd>
+        <dt class="col-sm-3">Focal length</dt><dd class="col-sm-9" th:text="${media.focalLength}">-</dd>
+        <dt class="col-sm-3">35mm focal length</dt><dd class="col-sm-9" th:text="${media.focalLength35mm}">-</dd>
+        <dt class="col-sm-3">Dimensions</dt>
+        <dd class="col-sm-9" th:text="${media.widthPx != null and media.heightPx != null} ? ${media.widthPx + ' × ' + media.heightPx + ' px'} : '-'">-</dd>
+        <dt class="col-sm-3">Duration</dt>
+        <dd class="col-sm-9" th:text="${media.durationSeconds != null} ? ${media.durationSeconds + ' seconds'} : '-'">-</dd>
+        <dt class="col-sm-3">Notes</dt><dd class="col-sm-9" th:text="${media.notes}">-</dd>
+    </dl>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

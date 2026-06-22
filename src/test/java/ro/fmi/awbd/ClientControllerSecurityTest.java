@@ -1,0 +1,25 @@
+package ro.fmi.awbd;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
+import ro.fmi.awbd.support.IntegrationTest;
+
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@IntegrationTest
+class ClientControllerSecurityTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Test
+    @WithMockUser(username = "client", roles = "CLIENT")
+    void clientCannotDeleteClient() throws Exception {
+        mockMvc.perform(post("/clients/1/delete").with(csrf()))
+                .andExpect(status().isForbidden());
+    }
+}
