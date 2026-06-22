@@ -29,8 +29,9 @@ public class SecurityJpaConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/perform_login", "/logout", "/access_denied",
+                        .requestMatchers("/login", "/perform_login", "/logout", "/access_denied",
                                 "/webjars/**", "/css/**", "/js/**", "/error").permitAll()
+                        .requestMatchers("/clients/**", "/locations/**", "/gear/**", "/stats/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/*/new", "/*/*/edit",
                                 "/shoots/*/media/**", "/shoots/*/invoice/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/**").hasRole("ADMIN")

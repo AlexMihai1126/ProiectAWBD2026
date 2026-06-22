@@ -19,7 +19,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4" sec:authorize="hasRole('ADMIN')">
             <div class="card h-100 shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title"><i class="fa-solid fa-users me-2"></i>Clients</h5>
@@ -28,7 +28,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4" sec:authorize="hasRole('ADMIN')">
             <div class="card h-100 shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title"><i class="fa-solid fa-location-dot me-2"></i>Locations</h5>
@@ -37,7 +37,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4" sec:authorize="hasRole('ADMIN')">
             <div class="card h-100 shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title"><i class="fa-solid fa-camera me-2"></i>Gear</h5>
@@ -46,7 +46,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4" sec:authorize="hasRole('ADMIN')">
             <div class="card h-100 shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title"><i class="fa-solid fa-chart-line me-2"></i>Statistics</h5>

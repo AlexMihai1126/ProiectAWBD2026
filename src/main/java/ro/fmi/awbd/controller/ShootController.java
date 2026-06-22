@@ -113,6 +113,6 @@ public class ShootController {
     private void populateOptions(Model model) {
         model.addAttribute("locations", locationService.getAllLocations());
         model.addAttribute("gearItems", gearService.getAllGear());
-        model.addAttribute("users", userService.getAllUsers());
+        model.addAttribute("users", userService.getPhotographers());
     }
 }

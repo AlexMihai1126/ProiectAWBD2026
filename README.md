@@ -160,7 +160,7 @@ Conform cerinței proiectului (Lab 2): **2 profiluri Spring** cu **2 baze de dat
 
 Profilul implicit la pornire (fără argumente): **`test`**.
 
-Scripturile SQL (`schema-h2.sql`, `schema-postgres.sql`) creează schema la pornire. `DataLoader` inserează utilizatorii impliciți dacă baza este goală.
+Scripturile SQL (`schema-h2.sql`, `schema-postgresql.sql`) creează schema la pornire. `DataLoader` inserează utilizatorii impliciți dacă baza este goală.
 
 ## Cerințe
 
@@ -368,7 +368,7 @@ src/main/java/ro/fmi/awbd/
 
 src/main/resources/
 ├── schema-h2.sql
-├── schema-postgres.sql
+├── schema-postgresql.sql
 ├── application-test.yml
 ├── application-dev.yml
 ├── logback-spring.xml
