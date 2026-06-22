@@ -28,13 +28,16 @@ public class MediaService {
     @Transactional(readOnly = true)
     public List<MediaResponse> listMedia(Long shootId) {
         ensureShootExists(shootId);
-        return mediaRepository.findByShootId(shootId).stream()
+        List<MediaResponse> media = mediaRepository.findByShootId(shootId).stream()
                 .map(mediaMapper::toResponse)
                 .toList();
+        log.debug("Listed {} media items for shoot id={}", media.size(), shootId);
+        return media;
     }
 
     @Transactional(readOnly = true)
     public MediaResponse getMedia(Long shootId, Long mediaId) {
+        log.debug("Fetching media id={} for shoot id={}", mediaId, shootId);
         return mediaMapper.toResponse(findForShoot(shootId, mediaId));
     }
 

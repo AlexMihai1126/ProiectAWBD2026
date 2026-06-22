@@ -18,4 +18,5 @@ public class ShootListItemResponse {
     private ShootStatus status;
     private OffsetDateTime startAt;
     private String locationName;
+    private String clientName;
 }

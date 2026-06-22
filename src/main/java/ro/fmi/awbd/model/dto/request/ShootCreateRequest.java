@@ -3,6 +3,7 @@ package ro.fmi.awbd.model.dto.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.AssertTrue;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -38,6 +39,14 @@ public class ShootCreateRequest {
     @NotNull
     private Long locationId;
 
+    @NotNull
+    private Long clientId;
+
     @Builder.Default
     private Set<Long> gearItemIds = new HashSet<>();
+
+    @AssertTrue(message = "End date must be the same as or later than the start date")
+    public boolean isDateRangeValid() {
+        return startAt == null || endAt == null || !endAt.isBefore(startAt);
+    }
 }

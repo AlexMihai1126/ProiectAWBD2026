@@ -6,8 +6,14 @@
 <nav th:replace="~{fragments/layout :: nav}"></nav>
 <div th:replace="~{fragments/layout :: flash}"></div>
 <main class="container py-4">
-    <h1 class="mb-1">Photography Management</h1>
-    <p class="text-muted">Manage shoots, clients, locations, gear and invoicing.</p>
+    <div sec:authorize="hasRole('ADMIN')">
+        <h1 class="mb-1">Photography Management App</h1>
+        <p class="text-muted">Manage shoots, clients, locations, gear and invoicing.</p>
+    </div>
+    <div sec:authorize="hasRole('CLIENT') and !hasRole('ADMIN')">
+        <h1 class="mb-1">Your Photography Portal</h1>
+        <p class="text-muted">View your upcoming sessions, delivered media and invoices in one place.</p>
+    </div>
 
     <div class="row g-3 mt-2">
         <div class="col-md-4">
@@ -19,7 +25,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4" sec:authorize="hasRole('ADMIN')">
             <div class="card h-100 shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title"><i class="fa-solid fa-users me-2"></i>Clients</h5>
@@ -28,7 +34,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4" sec:authorize="hasRole('ADMIN')">
             <div class="card h-100 shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title"><i class="fa-solid fa-location-dot me-2"></i>Locations</h5>
@@ -37,7 +43,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4" sec:authorize="hasRole('ADMIN')">
             <div class="card h-100 shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title"><i class="fa-solid fa-camera me-2"></i>Gear</h5>
@@ -46,7 +52,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4" sec:authorize="hasRole('ADMIN')">
             <div class="card h-100 shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title"><i class="fa-solid fa-chart-line me-2"></i>Statistics</h5>

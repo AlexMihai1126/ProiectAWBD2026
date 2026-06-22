@@ -14,6 +14,7 @@ import ro.fmi.awbd.model.dto.request.ClientCreateRequest;
 import ro.fmi.awbd.model.dto.request.ClientUpdateRequest;
 import ro.fmi.awbd.model.dto.response.ClientResponse;
 import ro.fmi.awbd.service.ClientService;
+import ro.fmi.awbd.service.UserService;
 
 @Controller
 @RequestMapping("/clients")
@@ -21,6 +22,7 @@ import ro.fmi.awbd.service.ClientService;
 public class ClientController {
 
     private final ClientService clientService;
+    private final UserService userService;
 
     @GetMapping
     public String list(@PageableDefault(size = 10, sort = "name", direction = Sort.Direction.ASC) Pageable pageable,
@@ -38,13 +40,15 @@ public class ClientController {
     @GetMapping("/new")
     public String createForm(Model model) {
         model.addAttribute("form", new ClientCreateRequest());
+        populateUsers(model);
         return "client/form";
     }
 
     @PostMapping
     public String create(@Valid @ModelAttribute("form") ClientCreateRequest form,
-                        BindingResult result, RedirectAttributes ra) {
+                        BindingResult result, Model model, RedirectAttributes ra) {
         if (result.hasErrors()) {
+            populateUsers(model);
             return "client/form";
         }
         ClientResponse saved = clientService.createClient(form);
@@ -56,8 +60,10 @@ public class ClientController {
     public String editForm(@PathVariable Long id, Model model) {
         ClientResponse c = clientService.getClient(id);
         model.addAttribute("form", ClientCreateRequest.builder()
-                .name(c.getName()).email(c.getEmail()).phone(c.getPhone()).notes(c.getNotes()).build());
+                .name(c.getName()).email(c.getEmail()).phone(c.getPhone()).notes(c.getNotes())
+                .userId(c.getUserId()).build());
         model.addAttribute("editId", id);
+        populateUsers(model);
         return "client/form";
     }
 
@@ -66,10 +72,12 @@ public class ClientController {
                         BindingResult result, Model model, RedirectAttributes ra) {
         if (result.hasErrors()) {
             model.addAttribute("editId", id);
+            populateUsers(model);
             return "client/form";
         }
         clientService.updateClient(id, ClientUpdateRequest.builder()
-                .name(form.getName()).email(form.getEmail()).phone(form.getPhone()).notes(form.getNotes()).build());
+                .name(form.getName()).email(form.getEmail()).phone(form.getPhone()).notes(form.getNotes())
+                .userId(form.getUserId()).build());
         ra.addFlashAttribute("flash", "Client updated.");
         return "redirect:/clients/" + id;
     }
@@ -79,5 +87,9 @@ public class ClientController {
         clientService.deleteClient(id);
         ra.addFlashAttribute("flash", "Client deleted.");
         return "redirect:/clients";
+    }
+
+    private void populateUsers(Model model) {
+        model.addAttribute("users", userService.getAllUsers());
     }
 }

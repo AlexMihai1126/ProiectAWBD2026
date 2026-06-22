@@ -35,7 +35,7 @@ public class GearController {
 
     @ModelAttribute("users")
     public List<UserOptionResponse> users() {
-        return userService.getAllUsers();
+        return userService.getPhotographers();
     }
 
     @GetMapping

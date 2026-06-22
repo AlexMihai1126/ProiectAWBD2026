@@ -20,24 +20,29 @@
                 <label class="form-label" for="startAt">Start *</label>
                 <input class="form-control" th:classappend="${#fields.hasErrors('startAt')} ? 'is-invalid'"
                        id="startAt" name="startAt" type="datetime-local" required
-                       th:value="${form.startAt != null} ? ${#temporals.format(form.startAt, 'yyyy-MM-dd''T''HH:mm')} : ''">
+                       th:value="${@dateTime.formatInput(form.startAt)}">
                 <div class="invalid-feedback" th:if="${#fields.hasErrors('startAt')}" th:errors="*{startAt}">err</div>
             </div>
             <div class="mb-3 col-md-6">
                 <label class="form-label" for="endAt">End</label>
-                <input class="form-control" id="endAt" name="endAt" type="datetime-local"
-                       th:value="${form.endAt != null} ? ${#temporals.format(form.endAt, 'yyyy-MM-dd''T''HH:mm')} : ''">
+                <input class="form-control" th:classappend="${#fields.hasErrors('dateRangeValid')} ? 'is-invalid'"
+                       id="endAt" name="endAt" type="datetime-local"
+                       th:value="${@dateTime.formatInput(form.endAt)}">
+                <div class="invalid-feedback"
+                     th:text="${#fields.hasErrors('dateRangeValid') ? #fields.errors('dateRangeValid')[0] : 'End date must be the same as or later than the start date'}">
+                    End date must be the same as or later than the start date
+                </div>
             </div>
         </div>
 
         <div class="row">
-            <div class="mb-3 col-md-4">
+            <div class="mb-3 col-md-3">
                 <label class="form-label" for="status">Status</label>
                 <select class="form-select" id="status" th:field="*{status}">
                     <option th:each="st : ${statuses}" th:value="${st}" th:text="${st}">STATUS</option>
                 </select>
             </div>
-            <div class="mb-3 col-md-4">
+            <div class="mb-3 col-md-3">
                 <label class="form-label" for="ownerId">Photographer *</label>
                 <select class="form-select" th:classappend="${#fields.hasErrors('ownerId')} ? 'is-invalid'"
                         id="ownerId" th:field="*{ownerId}" required>
@@ -46,7 +51,7 @@
                 </select>
                 <div class="invalid-feedback" th:if="${#fields.hasErrors('ownerId')}" th:errors="*{ownerId}">err</div>
             </div>
-            <div class="mb-3 col-md-4">
+            <div class="mb-3 col-md-3">
                 <label class="form-label" for="locationId">Location *</label>
                 <select class="form-select" th:classappend="${#fields.hasErrors('locationId')} ? 'is-invalid'"
                         id="locationId" th:field="*{locationId}" required>
@@ -54,6 +59,15 @@
                     <option th:each="l : ${locations}" th:value="${l.id}" th:text="${l.name}">location</option>
                 </select>
                 <div class="invalid-feedback" th:if="${#fields.hasErrors('locationId')}" th:errors="*{locationId}">err</div>
+            </div>
+            <div class="mb-3 col-md-3">
+                <label class="form-label" for="clientId">Client *</label>
+                <select class="form-select" th:classappend="${#fields.hasErrors('clientId')} ? 'is-invalid'"
+                        id="clientId" th:field="*{clientId}" required>
+                    <option value="">-- select --</option>
+                    <option th:each="c : ${clients}" th:value="${c.id}" th:text="${c.name}">client</option>
+                </select>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('clientId')}" th:errors="*{clientId}">err</div>
             </div>
         </div>
 
@@ -77,6 +91,16 @@
 <footer th:replace="~{fragments/layout :: footer}"></footer>
 <script>
     (function () {
+        var start = document.getElementById('startAt');
+        var end = document.getElementById('endAt');
+        function validateDateRange() {
+            var invalid = start.value && end.value && end.value < start.value;
+            end.setCustomValidity(invalid ? 'End date must be the same as or later than the start date' : '');
+        }
+        start.addEventListener('input', validateDateRange);
+        end.addEventListener('input', validateDateRange);
+        validateDateRange();
+
         document.querySelectorAll('.needs-validation').forEach(function (f) {
             f.addEventListener('submit', function (e) {
                 if (!f.checkValidity()) { e.preventDefault(); e.stopPropagation(); }

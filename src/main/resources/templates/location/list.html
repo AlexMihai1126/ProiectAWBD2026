@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/layout :: head('Locations')}"></head>
 <body>
 <nav th:replace="~{fragments/layout :: nav}"></nav>
@@ -7,7 +8,7 @@
 <main class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="h3 mb-0">Locations</h1>
-        <a class="btn btn-success" th:href="@{/locations/new}"><i class="fa-solid fa-plus me-1"></i>New location</a>
+        <a class="btn btn-success" sec:authorize="hasRole('ADMIN')" th:href="@{/locations/new}"><i class="fa-solid fa-plus me-1"></i>New location</a>
     </div>
 
     <div th:if="${page.totalElements == 0}" class="alert alert-info">No locations yet.</div>
@@ -15,10 +16,8 @@
     <table th:if="${page.totalElements > 0}" class="table table-striped table-hover align-middle">
         <thead>
         <tr>
-            <th><a th:href="@{/locations(sort='name,asc', size=${page.size})}">Name</a>
-                / <a th:href="@{/locations(sort='name,desc', size=${page.size})}">desc</a></th>
-            <th><a th:href="@{/locations(sort='country,asc', size=${page.size})}">Country</a>
-                / <a th:href="@{/locations(sort='country,desc', size=${page.size})}">desc</a></th>
+            <th th:replace="~{fragments/layout :: sortableHeader(${page}, '/locations', 'name', 'Name')}"></th>
+            <th th:replace="~{fragments/layout :: sortableHeader(${page}, '/locations', 'country', 'Country')}"></th>
             <th>County</th>
             <th class="text-end">Actions</th>
         </tr>
@@ -28,13 +27,14 @@
             <td><a th:href="@{/locations/{id}(id=${l.id})}" th:text="${l.name}">Name</a></td>
             <td th:text="${l.country}">country</td>
             <td th:text="${l.county}">county</td>
-            <td class="text-end">
+            <td class="text-end" sec:authorize="hasRole('ADMIN')">
                 <a class="btn btn-sm btn-outline-primary" th:href="@{/locations/{id}/edit(id=${l.id})}">Edit</a>
                 <form class="d-inline" th:action="@{/locations/{id}/delete(id=${l.id})}" method="post"
                       onsubmit="return confirm('Delete this location?');">
                     <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
                 </form>
             </td>
+            <td class="text-end" sec:authorize="!hasRole('ADMIN')"></td>
         </tr>
         </tbody>
     </table>

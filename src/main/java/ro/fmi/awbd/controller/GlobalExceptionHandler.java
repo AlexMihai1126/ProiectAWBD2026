@@ -3,10 +3,14 @@ package ro.fmi.awbd.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import ro.fmi.awbd.exception.BadRequestException;
 import ro.fmi.awbd.exception.DuplicateResourceException;
 import ro.fmi.awbd.exception.ResourceNotFoundException;
@@ -15,11 +19,32 @@ import ro.fmi.awbd.exception.ResourceNotFoundException;
 @Slf4j
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler({AccessDeniedException.class, AuthorizationDeniedException.class})
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public String handleAccessDenied(AccessDeniedException ex) {
+        log.warn("Access denied: {}", ex.getMessage());
+        return "forward:/access_denied";
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleNoResource(NoResourceFoundException ex) {
+        log.debug("Resource not found: {}", ex.getResourcePath());
+        return "error/404";
+    }
+
     @ExceptionHandler(ResourceNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleNotFound(ResourceNotFoundException ex, Model model) {
         log.warn("Not found: {}", ex.getMessage());
         return render(model, 404, "Not Found", ex.getMessage());
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleTypeMismatch(MethodArgumentTypeMismatchException ex, Model model) {
+        log.warn("Invalid request parameter: {}", ex.getMessage());
+        return render(model, 400, "Bad Request", "Invalid value in the request URL.");
     }
 
     @ExceptionHandler(DuplicateResourceException.class)
@@ -46,7 +71,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public String handleGeneric(Exception ex, Model model) {
+    public String handleGeneric(Exception ex, Model model) throws Exception {
+        if (ex instanceof AccessDeniedException accessDenied) {
+            throw accessDenied;
+        }
         log.error("Unhandled exception", ex);
         return render(model, 500, "Internal Server Error", "Something went wrong. Please try again later.");
     }

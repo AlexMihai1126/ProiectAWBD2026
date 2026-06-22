@@ -45,7 +45,7 @@
             <div class="mb-3 col-md-4">
                 <label class="form-label" for="paidAt">Paid at</label>
                 <input class="form-control" id="paidAt" name="paidAt" type="datetime-local"
-                       th:value="${form.paidAt != null} ? ${#temporals.format(form.paidAt, 'yyyy-MM-dd''T''HH:mm')} : ''">
+                       th:value="${@dateTime.formatInput(form.paidAt)}">
             </div>
         </div>
         <div class="mb-3">

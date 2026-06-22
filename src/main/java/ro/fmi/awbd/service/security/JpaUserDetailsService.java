@@ -2,7 +2,6 @@ package ro.fmi.awbd.service.security;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,7 +21,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Profile("postgresql")
 public class JpaUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
@@ -32,12 +30,14 @@ public class JpaUserDetailsService implements UserDetailsService {
         User user;
 
         Optional<User> userOpt = userRepository.findByUsername(username);
-        if (userOpt.isPresent())
+        if (userOpt.isPresent()) {
             user = userOpt.get();
-        else
+        } else {
+            log.warn("Login failed, unknown username: {}", username);
             throw new UsernameNotFoundException("Username: " + username);
+        }
 
-        log.info(user.toString());
+        log.debug("Loaded user details for username={}", user.getUsername());
 
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),

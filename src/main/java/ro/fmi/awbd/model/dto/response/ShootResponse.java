@@ -24,6 +24,8 @@ public class ShootResponse {
     private String ownerUsername;
     private Long locationId;
     private String locationName;
+    private Long clientId;
+    private String clientName;
     private Set<Long> gearItemIds;
     private Long invoiceId;
     private OffsetDateTime createdAt;
