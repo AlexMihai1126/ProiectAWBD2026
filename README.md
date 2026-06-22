@@ -191,10 +191,6 @@ Sau simplu (profil implicit):
 .\gradlew.bat bootRun
 ```
 
-Aplicația: [http://localhost:8080](http://localhost:8080)
-
-Consolă H2: [http://localhost:8080/h2-console](http://localhost:8080/h2-console)
-
 
 | Câmp     | Valoare              |
 | -------- | -------------------- |
@@ -249,8 +245,6 @@ Configurări incluse în `.run/`:
 | `client2`  | `client2`| CLIENT | Vizualizarea ședințelor proprii               |
 | `client3`  | `client3`| CLIENT | Vizualizarea ședințelor proprii               |
 
-
-Pagina de login: [http://localhost:8080/login](http://localhost:8080/login)
 
 Utilizatorii neautorizați pentru o acțiune sunt redirecționați către `/access_denied` (403).
 
@@ -385,27 +379,27 @@ Pagina **Stats** validează intervalul de timp în controller: dacă `from` este
 
 #### 1. Login
 
-[Login page](docs/screenshots/login.png)
+![Login page](docs/screenshots/login.png)
 
 #### 2. Dashboard
 
-[Dashboard](docs/screenshots/dashboard.png)
+![Dashboard](docs/screenshots/dashboard.png)
 
 #### 3. Listă clienți
 
-[Lista clienti](docs/screenshots/clients.png)
+![Lista clienti](docs/screenshots/clients.png)
 
 #### 4. Validare formular
 
-[Validare clienti](docs/screenshots/clientsvalidare.png)
+![Validare clienti](docs/screenshots/clientsvalidare.png)
 
 #### 5. Detaliu ședință
 
-[Sedinta](docs/screenshots/sedinta.png)
+![Sedinta](docs/screenshots/sedinta.png)
 
 #### 6. Statistici
 
-[Statistici](docs/screenshots/statistici.png)
+![Statistici](docs/screenshots/statistici.png)
 
 #### 7. Vizualizare client
 
@@ -415,7 +409,7 @@ Login ca `client` / `client`: dashboard „My shoots”, doar ședințele propri
 
 #### 8. Acces interzis
 
-[Acces interzis](docs/screenshots/forbidden.png)
+![Acces interzis](docs/screenshots/forbidden.png)
 
 ## Logging
 
