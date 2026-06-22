@@ -7,7 +7,7 @@
 <div th:replace="~{fragments/layout :: flash}"></div>
 <main class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="h3 mb-0">Shoots</h1>
+        <h1 class="h3 mb-0" th:text="${clientView} ? 'My shoots' : 'Shoots'">Shoots</h1>
         <a class="btn btn-success" sec:authorize="hasRole('ADMIN')" th:href="@{/shoots/new}"><i class="fa-solid fa-plus me-1"></i>New shoot</a>
     </div>
 
@@ -16,21 +16,21 @@
     <table th:if="${page.totalElements > 0}" class="table table-striped table-hover align-middle">
         <thead>
         <tr>
-            <th><a th:href="@{/shoots(sort='title,asc', size=${page.size})}">Title</a>
-                / <a th:href="@{/shoots(sort='title,desc', size=${page.size})}">desc</a></th>
-            <th><a th:href="@{/shoots(sort='startAt,desc', size=${page.size})}">Start</a>
-                / <a th:href="@{/shoots(sort='startAt,asc', size=${page.size})}">asc</a></th>
-            <th><a th:href="@{/shoots(sort='status,asc', size=${page.size})}">Status</a></th>
+            <th th:replace="~{fragments/layout :: sortableHeader(${page}, '/shoots', 'title', 'Title')}"></th>
+            <th th:replace="~{fragments/layout :: sortableHeader(${page}, '/shoots', 'startAt', 'Start')}"></th>
+            <th th:replace="~{fragments/layout :: sortableHeader(${page}, '/shoots', 'status', 'Status')}"></th>
             <th>Location</th>
+            <th sec:authorize="!hasRole('CLIENT') or hasRole('ADMIN')">Client</th>
             <th class="text-end">Actions</th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="s : ${page.content}">
             <td><a th:href="@{/shoots/{id}(id=${s.id})}" th:text="${s.title}">Title</a></td>
-            <td th:text="${s.startAt != null} ? ${#temporals.format(s.startAt, 'yyyy-MM-dd HH:mm')} : ''">start</td>
+            <td th:text="${@dateTime.formatDisplay(s.startAt)}">start</td>
             <td><span class="badge bg-secondary" th:text="${s.status}">STATUS</span></td>
             <td th:text="${s.locationName}">location</td>
+            <td sec:authorize="!hasRole('CLIENT') or hasRole('ADMIN')" th:text="${s.clientName}">client</td>
             <td class="text-end" sec:authorize="hasRole('ADMIN')">
                 <a class="btn btn-sm btn-outline-primary" th:href="@{/shoots/{id}/edit(id=${s.id})}">Edit</a>
                 <form class="d-inline" th:action="@{/shoots/{id}/delete(id=${s.id})}" method="post"
@@ -38,7 +38,10 @@
                     <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
                 </form>
             </td>
-            <td class="text-end" sec:authorize="!hasRole('ADMIN')"></td>
+            <td class="text-end" sec:authorize="!hasRole('ADMIN')">
+                <a class="btn btn-sm btn-outline-primary" sec:authorize="hasRole('CLIENT')"
+                   th:href="@{/shoots/{id}(id=${s.id})}">View</a>
+            </td>
         </tr>
         </tbody>
     </table>

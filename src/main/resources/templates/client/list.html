@@ -16,10 +16,8 @@
     <table th:if="${page.totalElements > 0}" class="table table-striped table-hover align-middle">
         <thead>
         <tr>
-            <th><a th:href="@{/clients(sort='name,asc', size=${page.size})}">Name</a>
-                / <a th:href="@{/clients(sort='name,desc', size=${page.size})}">desc</a></th>
-            <th><a th:href="@{/clients(sort='email,asc', size=${page.size})}">Email</a>
-                / <a th:href="@{/clients(sort='email,desc', size=${page.size})}">desc</a></th>
+            <th th:replace="~{fragments/layout :: sortableHeader(${page}, '/clients', 'name', 'Name')}"></th>
+            <th th:replace="~{fragments/layout :: sortableHeader(${page}, '/clients', 'email', 'Email')}"></th>
             <th>Phone</th>
             <th class="text-end">Actions</th>
         </tr>

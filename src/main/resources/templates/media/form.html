@@ -29,7 +29,7 @@
             <div class="mb-3 col-md-4">
                 <label class="form-label" for="takenAt">Taken at</label>
                 <input class="form-control" id="takenAt" name="takenAt" type="datetime-local"
-                       th:value="${form.takenAt != null} ? ${#temporals.format(form.takenAt, 'yyyy-MM-dd''T''HH:mm')} : ''">
+                       th:value="${@dateTime.formatInput(form.takenAt)}">
             </div>
             <div class="mb-3 col-md-2">
                 <label class="form-label" for="rating">Rating (1-5)</label>

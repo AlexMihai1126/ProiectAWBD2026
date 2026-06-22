@@ -12,12 +12,12 @@
         <div class="col-md-4">
             <label class="form-label" for="from">From *</label>
             <input class="form-control" id="from" name="from" type="datetime-local" required
-                   th:value="${from != null} ? ${#temporals.format(from, 'yyyy-MM-dd''T''HH:mm')} : ''">
+                   th:value="${@dateTime.formatInput(from)}">
         </div>
         <div class="col-md-4">
             <label class="form-label" for="to">To</label>
             <input class="form-control" id="to" name="to" type="datetime-local"
-                   th:value="${to != null} ? ${#temporals.format(to, 'yyyy-MM-dd''T''HH:mm')} : ''">
+                   th:value="${@dateTime.formatInput(to)}">
         </div>
         <div class="col-md-4">
             <button class="btn btn-primary" type="submit">Compute</button>

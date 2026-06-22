@@ -25,6 +25,14 @@
             <input class="form-control" id="phone" type="text" th:field="*{phone}" maxlength="30">
         </div>
         <div class="mb-3">
+            <label class="form-label" for="userId">Login account</label>
+            <select class="form-select" id="userId" th:field="*{userId}">
+                <option value="">-- no account --</option>
+                <option th:each="u : ${users}" th:value="${u.id}" th:text="${u.username}">account</option>
+            </select>
+            <div class="form-text">The linked account will receive client access and only see this client's shoots.</div>
+        </div>
+        <div class="mb-3">
             <label class="form-label" for="notes">Notes</label>
             <textarea class="form-control" id="notes" rows="3" th:field="*{notes}" maxlength="1000"></textarea>
         </div>

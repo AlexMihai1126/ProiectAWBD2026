@@ -16,10 +16,8 @@
     <table th:if="${page.totalElements > 0}" class="table table-striped table-hover align-middle">
         <thead>
         <tr>
-            <th><a th:href="@{/locations(sort='name,asc', size=${page.size})}">Name</a>
-                / <a th:href="@{/locations(sort='name,desc', size=${page.size})}">desc</a></th>
-            <th><a th:href="@{/locations(sort='country,asc', size=${page.size})}">Country</a>
-                / <a th:href="@{/locations(sort='country,desc', size=${page.size})}">desc</a></th>
+            <th th:replace="~{fragments/layout :: sortableHeader(${page}, '/locations', 'name', 'Name')}"></th>
+            <th th:replace="~{fragments/layout :: sortableHeader(${page}, '/locations', 'country', 'Country')}"></th>
             <th>County</th>
             <th class="text-end">Actions</th>
         </tr>

@@ -10,6 +10,7 @@
     <dl class="row">
         <dt class="col-sm-3">Email</dt><dd class="col-sm-9" th:text="${client.email}">-</dd>
         <dt class="col-sm-3">Phone</dt><dd class="col-sm-9" th:text="${client.phone}">-</dd>
+        <dt class="col-sm-3">Login account</dt><dd class="col-sm-9" th:text="${client.username ?: 'Not linked'}">-</dd>
         <dt class="col-sm-3">Notes</dt><dd class="col-sm-9" th:text="${client.notes}">-</dd>
     </dl>
     <a class="btn btn-outline-primary" sec:authorize="hasRole('ADMIN')" th:href="@{/clients/{id}/edit(id=${client.id})}">Edit</a>
