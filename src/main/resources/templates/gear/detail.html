@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Gear item')}"></head>
 <body>
-<nav th:replace="~{fragments/layout :: nav}"></nav>
+<nav th:replace="~{fragments/layout :: mainNav}"></nav>
 <div th:replace="~{fragments/layout :: flash}"></div>
 <main class="container py-4">
     <h1 class="h3 mb-3"><span th:text="${gear.brand}">Brand</span> <span th:text="${gear.model}">Model</span></h1>

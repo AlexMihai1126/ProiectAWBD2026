@@ -38,7 +38,6 @@ public class DataLoader implements CommandLineRunner {
         ensureClient("Demo Client", "client@example.com", client);
         ensureClient("Portrait Client", "client2@example.com", client2);
         ensureClient("Events Client", "client3@example.com", client3);
-        removeLegacyGuestAccess();
     }
 
     private Authority findOrCreateRole(String role) {
@@ -91,31 +90,6 @@ public class DataLoader implements CommandLineRunner {
                     .build());
             log.info("Seeded client profile for account: {}", user.getUsername());
         }
-    }
-
-    private void removeLegacyGuestAccess() {
-        authorityRepository.findByRole("ROLE_GUEST").ifPresent(guestRole -> {
-            userRepository.findAll().forEach(user -> {
-                HashSet<Authority> roles = new HashSet<>();
-                if (user.getAuthorities() != null) {
-                    roles.addAll(user.getAuthorities());
-                }
-                if (roles.removeIf(a -> "ROLE_GUEST".equals(a.getRole()))) {
-                    user.setAuthorities(roles);
-                    userRepository.save(user);
-                }
-            });
-            authorityRepository.delete(guestRole);
-            log.info("Removed legacy ROLE_GUEST authority");
-        });
-
-        userRepository.findByUsername("guest").ifPresent(guest -> {
-            if (guest.getEnabled()) {
-                guest.setEnabled(false);
-                userRepository.save(guest);
-                log.info("Disabled legacy guest account");
-            }
-        });
     }
 
     private boolean isBcryptHash(String password) {
