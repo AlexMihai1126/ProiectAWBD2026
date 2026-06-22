@@ -389,11 +389,11 @@ Pagina **Stats** validează intervalul de timp în controller: dacă `from` este
 
 ![Lista clienti](docs/screenshots/clients.png)
 
-#### 4. Validare formular
+#### 4. Validări formular
 
 ![Validare photo shoot](docs/screenshots/shoot_validation.png)
 
-#### 5. Detaliu ședință
+#### 5. Detalii ședință
 
 ![Sedinta](docs/screenshots/sedinta.png)
 
@@ -403,7 +403,7 @@ Pagina **Stats** validează intervalul de timp în controller: dacă `from` este
 
 #### 7. Vizualizare client
 
-Login ca `client` / `client`: dashboard „My shoots”, doar ședințele proprii (fără meniuri admin).
+Login cu user `client` și parolă `client`: dashboard „My shoots” afișează doar ședințele proprii.
 
 ![Vizualizare client](docs/screenshots/guests.png)
 
@@ -447,8 +447,6 @@ Testele folosesc profilul `test` cu bază de date in-memory izolată (`jdbc:h2:m
 | **Integrare** (MockMvc + `@WithMockUser`) | `src/test/java/ro/fmi/awbd/integration/` + smoke tests | Securitate roluri, fluxuri MVC, persistență |
 | **Coverage**                              | JaCoCo (min. **70%** linii pe servicii)                | `./gradlew jacocoTestCoverageVerification`  |
 
-
-Raport HTML coverage: `build/reports/jacoco/test/html/index.html`
 
 ### Scenarii integrare (MockMvc)
 
