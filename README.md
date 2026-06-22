@@ -381,7 +381,7 @@ Pagina **Stats** validează intervalul de timp în controller: dacă `from` este
 
 ![Login page](docs/screenshots/login.png)
 
-#### 2. Dashboard
+#### 2. Dashboard admin
 
 ![Dashboard](docs/screenshots/dashboard.png)
 
