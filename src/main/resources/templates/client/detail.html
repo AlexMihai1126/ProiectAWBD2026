@@ -3,7 +3,7 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/layout :: head('Client')}"></head>
 <body>
-<nav th:replace="~{fragments/layout :: nav}"></nav>
+<nav th:replace="~{fragments/layout :: mainNav}"></nav>
 <div th:replace="~{fragments/layout :: flash}"></div>
 <main class="container py-4">
     <h1 class="h3 mb-3" th:text="${client.name}">Client</h1>
