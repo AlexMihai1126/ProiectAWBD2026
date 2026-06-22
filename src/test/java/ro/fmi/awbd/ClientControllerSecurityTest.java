@@ -17,8 +17,8 @@ class ClientControllerSecurityTest {
     private MockMvc mockMvc;
 
     @Test
-    @WithMockUser(username = "guest", roles = "GUEST")
-    void guestCannotDeleteClient() throws Exception {
+    @WithMockUser(username = "client", roles = "CLIENT")
+    void clientCannotDeleteClient() throws Exception {
         mockMvc.perform(post("/clients/1/delete").with(csrf()))
                 .andExpect(status().isForbidden());
     }

@@ -21,9 +21,12 @@ class DatabaseSmokeTest {
 
     @Test
     void seededUsersExist() {
-        assertThat(userRepository.count()).isGreaterThanOrEqualTo(2);
+        assertThat(userRepository.count()).isGreaterThanOrEqualTo(4);
         assertThat(userRepository.findByUsername("admin")).isPresent();
-        assertThat(userRepository.findByUsername("guest")).isPresent();
+        assertThat(userRepository.findByUsername("client")).isPresent();
+        assertThat(userRepository.findByUsername("client2")).isPresent();
+        assertThat(userRepository.findByUsername("client3")).isPresent();
+        assertThat(userRepository.findByUsername("guest")).isEmpty();
     }
 
     @Test

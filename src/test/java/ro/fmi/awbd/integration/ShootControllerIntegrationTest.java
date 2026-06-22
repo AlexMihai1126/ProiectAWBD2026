@@ -17,8 +17,8 @@ class ShootControllerIntegrationTest {
     private MockMvc mockMvc;
 
     @Test
-    @WithMockUser(username = "guest", roles = "GUEST")
-    void guestCanListShoots() throws Exception {
+    @WithMockUser(username = "client", roles = "CLIENT")
+    void clientCanListOwnShoots() throws Exception {
         mockMvc.perform(get("/shoots"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("shoot/list"));

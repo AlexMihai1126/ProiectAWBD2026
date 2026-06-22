@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
 @IntegrationTest
 class ClientControllerIntegrationTest {
@@ -20,11 +21,18 @@ class ClientControllerIntegrationTest {
     private MockMvc mockMvc;
 
     @Test
-    @WithMockUser(username = "guest", roles = "GUEST")
-    void guestCanListClients() throws Exception {
+    @WithMockUser(username = "client", roles = "CLIENT")
+    void clientCannotListOtherClients() throws Exception {
+        mockMvc.perform(get("/clients"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = "ADMIN")
+    void activeSortDirectionIsRendered() throws Exception {
         mockMvc.perform(get("/clients"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("client/list"));
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("fa-arrow-up")));
     }
 
     @Test

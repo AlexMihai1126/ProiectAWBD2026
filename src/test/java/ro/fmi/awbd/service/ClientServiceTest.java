@@ -13,7 +13,11 @@ import ro.fmi.awbd.model.dto.request.ClientCreateRequest;
 import ro.fmi.awbd.model.dto.request.ClientUpdateRequest;
 import ro.fmi.awbd.model.dto.response.ClientResponse;
 import ro.fmi.awbd.model.entity.ClientEntity;
+import ro.fmi.awbd.model.entity.security.Authority;
+import ro.fmi.awbd.model.entity.security.User;
 import ro.fmi.awbd.repository.ClientRepository;
+import ro.fmi.awbd.repository.security.AuthorityRepository;
+import ro.fmi.awbd.repository.security.UserRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +35,12 @@ class ClientServiceTest {
 
     @Mock
     private ClientMapper clientMapper;
+
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private AuthorityRepository authorityRepository;
 
     @InjectMocks
     private ClientService clientService;
@@ -85,6 +95,27 @@ class ClientServiceTest {
         when(clientMapper.toResponse(saved)).thenReturn(response);
 
         assertThat(clientService.createClient(request)).isEqualTo(response);
+    }
+
+    @Test
+    void createClientLinksAccountAndGrantsClientRole() {
+        ClientCreateRequest request = ClientCreateRequest.builder().name("Linked").userId(8L).build();
+        ClientEntity mapped = ClientEntity.builder().name("Linked").build();
+        User user = User.builder().id(8L).username("client").build();
+        Authority role = Authority.builder().id(3L).role("ROLE_CLIENT").build();
+        ClientEntity saved = ClientEntity.builder().id(9L).name("Linked").user(user).build();
+        ClientResponse response = ClientResponse.builder().id(9L).userId(8L).username("client").build();
+        when(clientMapper.toEntity(request)).thenReturn(mapped);
+        when(clientRepository.existsByUserId(8L)).thenReturn(false);
+        when(userRepository.findById(8L)).thenReturn(Optional.of(user));
+        when(authorityRepository.findByRole("ROLE_CLIENT")).thenReturn(Optional.of(role));
+        when(clientRepository.save(mapped)).thenReturn(saved);
+        when(clientMapper.toResponse(saved)).thenReturn(response);
+
+        assertThat(clientService.createClient(request)).isEqualTo(response);
+        assertThat(mapped.getUser()).isEqualTo(user);
+        assertThat(user.getAuthorities()).extracting(Authority::getRole).containsExactly("ROLE_CLIENT");
+        verify(userRepository).save(user);
     }
 
     @Test

@@ -55,12 +55,12 @@ class JpaUserDetailsServiceTest {
     @Test
     void loadUserByUsernameHandlesNullAuthorities() {
         User user = new User();
-        user.setUsername("guest");
+        user.setUsername("client");
         user.setPassword("pwd");
         user.setAuthorities(null);
-        when(userRepository.findByUsername("guest")).thenReturn(Optional.of(user));
+        when(userRepository.findByUsername("client")).thenReturn(Optional.of(user));
 
-        UserDetails details = userDetailsService.loadUserByUsername("guest");
+        UserDetails details = userDetailsService.loadUserByUsername("client");
 
         assertThat(details.getAuthorities()).isEmpty();
     }

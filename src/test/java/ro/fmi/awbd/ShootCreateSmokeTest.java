@@ -3,12 +3,14 @@ package ro.fmi.awbd;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import ro.fmi.awbd.model.dto.request.GearCreateRequest;
+import ro.fmi.awbd.model.dto.request.ClientCreateRequest;
 import ro.fmi.awbd.model.dto.request.LocationCreateRequest;
 import ro.fmi.awbd.model.dto.request.ShootCreateRequest;
 import ro.fmi.awbd.model.enums.GearType;
 import ro.fmi.awbd.model.enums.ShootStatus;
 import ro.fmi.awbd.repository.security.UserRepository;
 import ro.fmi.awbd.service.GearService;
+import ro.fmi.awbd.service.ClientService;
 import ro.fmi.awbd.service.LocationService;
 import ro.fmi.awbd.service.ShootService;
 import ro.fmi.awbd.support.IntegrationTest;
@@ -29,11 +31,14 @@ class ShootCreateSmokeTest {
     private GearService gearService;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private ClientService clientService;
 
     @Test
     void createShootWithGear() {
         var owner = userRepository.findByUsername("admin").orElseThrow();
         var location = locationService.createLocation(LocationCreateRequest.builder().name("Studio A").build());
+        var client = clientService.createClient(ClientCreateRequest.builder().name("Wedding Client").build());
         var gear = gearService.createGear(GearCreateRequest.builder()
                 .type(GearType.CAMERA_BODY)
                 .brand("Canon")
@@ -48,6 +53,7 @@ class ShootCreateSmokeTest {
                 .endAt(OffsetDateTime.now().plusDays(1).plusHours(2))
                 .ownerId(owner.getId())
                 .locationId(location.getId())
+                .clientId(client.getId())
                 .gearItemIds(Set.of(gear.getId()))
                 .build());
 

@@ -18,11 +18,10 @@ class StatsControllerIntegrationTest {
     private MockMvc mockMvc;
 
     @Test
-    @WithMockUser(username = "guest", roles = "GUEST")
-    void guestCanOpenStatsPageWithoutQuery() throws Exception {
+    @WithMockUser(username = "client", roles = "CLIENT")
+    void clientCannotOpenBusinessStats() throws Exception {
         mockMvc.perform(get("/stats"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("stats/index"));
+                .andExpect(status().isForbidden());
     }
 
     @Test
