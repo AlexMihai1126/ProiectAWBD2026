@@ -69,7 +69,7 @@ DTO-urile (`request` / `response`) și mapper-ele MapStruct separă entitățile
 
 | Entitate    | Descriere                                  |
 | ----------- | ------------------------------------------ |
-| `User`      | Utilizator autentificat (fotograf / admin) |
+| `User`      | Utilizator autentificat (admin, fotograf sau cont client) |
 | `Authority` | Rol (`ROLE_ADMIN`, `ROLE_CLIENT`)          |
 | `Client`    | Client al firmei                           |
 | `Location`  | Locație de shoot (cu geolocație opțională) |
@@ -82,11 +82,11 @@ DTO-urile (`request` / `response`) și mapper-ele MapStruct separă entitățile
 ### Relații JPA
 
 
-| Tip                         | Relație                                                                                                         |
-| --------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `@OneToOne`                 | `Shoot` ↔ `Invoice`                                                                                             |
-| `@OneToMany` / `@ManyToOne` | `Shoot` → `Media`, `Shoot` → `Location`, `Shoot` → `User` (fotograf), `Invoice` → `Client`, `GearItem` → `User` |
-| `@ManyToMany`               | `Shoot` ↔ `GearItem`, `User` ↔ `Authority`                                                                      |
+| Tip                         | Relație                                                                                                                                 |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `@OneToOne`                 | `Shoot` ↔ `Invoice`, `User` ↔ `Client` (cont portal client)                                                                             |
+| `@OneToMany` / `@ManyToOne` | `Shoot` → `Media`, `Shoot` → `Location`, `Shoot` → `User` (fotograf), `Shoot` → `Client`, `Invoice` → `Client`, `GearItem` → `User` |
+| `@ManyToMany`               | `Shoot` ↔ `GearItem`, `User` ↔ `Authority`                                                                                              |
 
 
 ### Diagramă ER
@@ -96,6 +96,8 @@ erDiagram
     USER ||--o{ GEAR_ITEM : owns
     USER }o--o{ AUTHORITY : has
     USER ||--o{ SHOOT : photographs
+    USER ||--|| CLIENT : account
+    CLIENT ||--o{ SHOOT : books
     LOCATION ||--o{ SHOOT : hosts
     CLIENT ||--o{ INVOICE : billed
     SHOOT ||--|| INVOICE : has
@@ -116,6 +118,7 @@ erDiagram
         string name
         string email
         string phone
+        bigint user_id FK
     }
     LOCATION {
         bigint id PK
@@ -227,6 +230,8 @@ docker compose down -v
 docker compose up -d postgres
 ```
 
+Profilul `dev` a fost testat cu PostgreSQL în Docker (schema + login + CRUD).
+
 ### 3. IDE
 
 Configurări incluse în `.run/`:
@@ -248,6 +253,101 @@ Configurări incluse în `.run/`:
 Pagina de login: [http://localhost:8080/login](http://localhost:8080/login)
 
 Utilizatorii neautorizați pentru o acțiune sunt redirecționați către `/access_denied` (403).
+
+## Rute aplicație (MVC)
+
+Aplicația expune pagini Thymeleaf (nu REST JSON). Rolurile provin din Spring Security; filtrarea ședințelor pentru CLIENT (doar cele proprii) se face suplimentar în servicii.
+
+### Autentificare și pagini generale
+
+| Metodă | Rută | Rol | Descriere |
+| ------ | ---- | --- | --------- |
+| GET | `/` | ADMIN, CLIENT | Dashboard |
+| GET | `/login` | public | Formular login |
+| POST | `/perform_login` | public | Procesare login (Spring Security) |
+| POST | `/logout` | autentificat | Deconectare |
+| GET | `/access_denied` | public | Pagină 403 |
+
+### Clienți (admin)
+
+| Metodă | Rută | Rol | Descriere |
+| ------ | ---- | --- | --------- |
+| GET | `/clients` | ADMIN | Listă paginată (+ sortare) |
+| GET | `/clients/{id}` | ADMIN | Detaliu client |
+| GET | `/clients/new` | ADMIN | Formular client nou |
+| POST | `/clients` | ADMIN | Creare client |
+| GET | `/clients/{id}/edit` | ADMIN | Formular editare |
+| POST | `/clients/{id}` | ADMIN | Actualizare client |
+| POST | `/clients/{id}/delete` | ADMIN | Ștergere client |
+
+### Locații (admin)
+
+| Metodă | Rută | Rol | Descriere |
+| ------ | ---- | --- | --------- |
+| GET | `/locations` | ADMIN | Listă paginată |
+| GET | `/locations/{id}` | ADMIN | Detaliu |
+| GET | `/locations/new` | ADMIN | Formular nou |
+| POST | `/locations` | ADMIN | Creare |
+| GET | `/locations/{id}/edit` | ADMIN | Editare |
+| POST | `/locations/{id}` | ADMIN | Actualizare |
+| POST | `/locations/{id}/delete` | ADMIN | Ștergere |
+
+### Echipament / gear (admin)
+
+| Metodă | Rută | Rol | Descriere |
+| ------ | ---- | --- | --------- |
+| GET | `/gear` | ADMIN | Listă paginată |
+| GET | `/gear/{id}` | ADMIN | Detaliu |
+| GET | `/gear/new` | ADMIN | Formular nou |
+| POST | `/gear` | ADMIN | Creare |
+| GET | `/gear/{id}/edit` | ADMIN | Editare |
+| POST | `/gear/{id}` | ADMIN | Actualizare |
+| POST | `/gear/{id}/delete` | ADMIN | Ștergere |
+
+### Ședințe foto (shoots)
+
+| Metodă | Rută | Rol | Descriere |
+| ------ | ---- | --- | --------- |
+| GET | `/shoots` | ADMIN, CLIENT | Listă (CLIENT: doar ședințele proprii) |
+| GET | `/shoots/{id}` | ADMIN, CLIENT | Detaliu ședință |
+| GET | `/shoots/new` | ADMIN | Formular ședință nouă |
+| POST | `/shoots` | ADMIN | Creare |
+| GET | `/shoots/{id}/edit` | ADMIN | Editare |
+| POST | `/shoots/{id}` | ADMIN | Actualizare |
+| POST | `/shoots/{id}/delete` | ADMIN | Ștergere |
+
+### Media (nested under shoot)
+
+| Metodă | Rută | Rol | Descriere |
+| ------ | ---- | --- | --------- |
+| GET | `/shoots/{shootId}/media/{mediaId}` | ADMIN, CLIENT | Detaliu media |
+| GET | `/shoots/{shootId}/media/new` | ADMIN | Formular media nou |
+| POST | `/shoots/{shootId}/media` | ADMIN | Creare |
+| GET | `/shoots/{shootId}/media/{mediaId}/edit` | ADMIN | Editare |
+| POST | `/shoots/{shootId}/media/{mediaId}` | ADMIN | Actualizare |
+| POST | `/shoots/{shootId}/media/{mediaId}/delete` | ADMIN | Ștergere |
+
+### Factură (nested under shoot, admin)
+
+| Metodă | Rută | Rol | Descriere |
+| ------ | ---- | --- | --------- |
+| GET | `/shoots/{shootId}/invoice/new` | ADMIN | Formular factură |
+| POST | `/shoots/{shootId}/invoice` | ADMIN | Creare |
+| GET | `/shoots/{shootId}/invoice/edit` | ADMIN | Editare |
+| POST | `/shoots/{shootId}/invoice/edit` | ADMIN | Actualizare |
+| POST | `/shoots/{shootId}/invoice/delete` | ADMIN | Ștergere |
+
+### Statistici (admin)
+
+| Metodă | Rută | Rol | Descriere |
+| ------ | ---- | --- | --------- |
+| GET | `/stats` | ADMIN | Statistici pe interval (`from`, `to`) |
+
+### Dezvoltare (profil `test`)
+
+| Metodă | Rută | Rol | Descriere |
+| ------ | ---- | --- | --------- |
+| GET | `/h2-console/**` | ADMIN | Consolă H2 (doar profil `test`) |
 
 ## Validare și gestionarea erorilor
 
@@ -309,7 +409,9 @@ Pagina **Stats** validează intervalul de timp în controller: dacă `from` este
 
 #### 7. Vizualizare client
 
-Clientul autentificat vede doar ședințele asociate profilului său.
+Login ca `client` / `client`: dashboard „My shoots”, doar ședințele proprii (fără meniuri admin).
+
+![Vizualizare client](docs/screenshots/guests.png)
 
 #### 8. Acces interzis
 
@@ -352,10 +454,12 @@ Raport HTML coverage: `build/reports/jacoco/test/html/index.html`
 
 ### Scenarii integrare (MockMvc)
 
-- Guest poate lista resurse, dar nu poate șterge (`ClientControllerSecurityTest`)
-- Admin poate crea client (`ClientControllerIntegrationTest`)
-- Guest listează ședințe; admin deschide formular nou (`ShootControllerIntegrationTest`)
-- Stats cu interval valid și mesaj la interval invalid (`StatsControllerIntegrationTest`)
+- Utilizator neautentificat este redirecționat la login (`SecurityRouteIntegrationTest`)
+- CLIENT poate deschide dashboard și lista propriilor ședințe; nu poate accesa rute admin (`SecurityRouteIntegrationTest`, `ShootControllerIntegrationTest`)
+- CLIENT nu poate șterge clienți sau face POST-uri de scriere (`ClientControllerSecurityTest`, `SecurityRouteIntegrationTest`)
+- CLIENT vede media doar de la ședințele proprii (`MediaControllerIntegrationTest`)
+- ADMIN poate crea client și deschide formulare CRUD (`ClientControllerIntegrationTest`, `ShootControllerIntegrationTest`)
+- Stats: ADMIN vede erori de interval invalid; CLIENT nu accesează `/stats` (`StatsControllerIntegrationTest`)
 
 ## Structură proiect
 
