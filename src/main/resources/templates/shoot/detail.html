@@ -47,15 +47,17 @@
             <td th:text="${m.fileRef}">file</td>
             <td th:text="${m.rating}">-</td>
             <td th:text="${@dateTime.formatDisplay(m.takenAt)}">-</td>
-            <td class="text-end" sec:authorize="hasRole('ADMIN')">
+            <td class="text-end">
                 <a class="btn btn-sm btn-outline-primary"
+                   th:href="@{/shoots/{sid}/media/{mid}(sid=${shoot.id}, mid=${m.id})}">View</a>
+                <a class="btn btn-sm btn-outline-secondary" sec:authorize="hasRole('ADMIN')"
                    th:href="@{/shoots/{sid}/media/{mid}/edit(sid=${shoot.id}, mid=${m.id})}">Edit</a>
-                <form class="d-inline" th:action="@{/shoots/{sid}/media/{mid}/delete(sid=${shoot.id}, mid=${m.id})}"
+                <form class="d-inline" sec:authorize="hasRole('ADMIN')"
+                      th:action="@{/shoots/{sid}/media/{mid}/delete(sid=${shoot.id}, mid=${m.id})}"
                       method="post" onsubmit="return confirm('Delete this media?');">
                     <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
                 </form>
             </td>
-            <td class="text-end" sec:authorize="!hasRole('ADMIN')"></td>
         </tr>
         </tbody>
     </table>

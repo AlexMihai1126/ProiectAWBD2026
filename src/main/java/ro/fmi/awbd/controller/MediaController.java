@@ -3,6 +3,7 @@ package ro.fmi.awbd.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import ro.fmi.awbd.model.dto.request.MediaUpdateRequest;
 import ro.fmi.awbd.model.dto.response.MediaResponse;
 import ro.fmi.awbd.model.enums.MediaType;
 import ro.fmi.awbd.service.MediaService;
+import ro.fmi.awbd.service.ShootService;
 
 @Controller
 @RequestMapping("/shoots/{shootId}/media")
@@ -19,10 +21,22 @@ import ro.fmi.awbd.service.MediaService;
 public class MediaController {
 
     private final MediaService mediaService;
+    private final ShootService shootService;
 
     @ModelAttribute("mediaTypes")
     public MediaType[] mediaTypes() {
         return MediaType.values();
+    }
+
+    @GetMapping("/{mediaId}")
+    public String detail(@PathVariable Long shootId, @PathVariable Long mediaId,
+                         Model model, Authentication authentication) {
+        if (isClient(authentication)) {
+            shootService.getShootByIdForClient(shootId, authentication.getName());
+        }
+        model.addAttribute("media", mediaService.getMedia(shootId, mediaId));
+        model.addAttribute("shootId", shootId);
+        return "media/detail";
     }
 
     @GetMapping("/new")
@@ -82,5 +96,13 @@ public class MediaController {
         mediaService.deleteMedia(shootId, mediaId);
         ra.addFlashAttribute("flash", "Media deleted.");
         return "redirect:/shoots/" + shootId;
+    }
+
+    private boolean isClient(Authentication authentication) {
+        boolean admin = authentication.getAuthorities().stream()
+                .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
+        boolean client = authentication.getAuthorities().stream()
+                .anyMatch(a -> "ROLE_CLIENT".equals(a.getAuthority()));
+        return client && !admin;
     }
 }

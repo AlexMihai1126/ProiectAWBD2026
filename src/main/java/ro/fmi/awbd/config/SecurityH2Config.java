@@ -43,9 +43,10 @@ public class SecurityH2Config {
                                 "/webjars/**", "/css/**", "/js/**", "/error").permitAll()
                         .requestMatchers("/h2-console/**", "/clients/**", "/locations/**", "/gear/**", "/stats/**",
                                 "/shoots/new", "/shoots/*/edit",
-                                "/shoots/*/media/**", "/shoots/*/invoice/**").hasRole("ADMIN")
+                                "/shoots/*/media/new", "/shoots/*/media/*/edit",
+                                "/shoots/*/invoice/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/", "/shoots", "/shoots/*")
+                        .requestMatchers(HttpMethod.GET, "/", "/shoots", "/shoots/*", "/shoots/*/media/*")
                                 .hasAnyRole("ADMIN", "CLIENT")
                         .anyRequest().hasRole("ADMIN")
                 )
