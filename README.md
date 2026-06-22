@@ -391,7 +391,7 @@ Pagina **Stats** validează intervalul de timp în controller: dacă `from` este
 
 #### 4. Validare formular
 
-![Validare clienti](docs/screenshots/clientsvalidare.png)
+![Validare photo shoot](docs/screenshots/shoot_validation.png)
 
 #### 5. Detaliu ședință
 
@@ -399,7 +399,7 @@ Pagina **Stats** validează intervalul de timp în controller: dacă `from` este
 
 #### 6. Statistici
 
-![Statistici](docs/screenshots/statistici.png)
+![Statistici](docs/screenshots/stats.png)
 
 #### 7. Vizualizare client
 
@@ -410,6 +410,10 @@ Login ca `client` / `client`: dashboard „My shoots”, doar ședințele propri
 #### 8. Acces interzis
 
 ![Acces interzis](docs/screenshots/forbidden.png)
+
+#### 9. Eroare ștergere
+
+![Eroare ștergere](docs/screenshots/delete_error.png)
 
 ## Logging
 
