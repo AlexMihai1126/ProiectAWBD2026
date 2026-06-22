@@ -48,6 +48,10 @@ public class ShootEntity {
     @JoinColumn(name = "location_id", nullable = false)
     private LocationEntity location;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "client_id")
+    private ClientEntity client;
+
     @OneToOne(mappedBy = "shoot", cascade = CascadeType.ALL, orphanRemoval = true)
     private InvoiceEntity invoice;
 
