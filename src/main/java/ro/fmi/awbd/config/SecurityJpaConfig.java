@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,16 +27,27 @@ public class SecurityJpaConfig {
     }
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    DaoAuthenticationProvider authenticationProvider(PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
+        provider.setPasswordEncoder(passwordEncoder);
+        return provider;
+    }
+
+    @Bean
+    SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                            DaoAuthenticationProvider authenticationProvider) throws Exception {
         return http
+                .authenticationProvider(authenticationProvider)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/perform_login", "/logout", "/access_denied",
                                 "/webjars/**", "/css/**", "/js/**", "/error").permitAll()
-                        .requestMatchers("/clients/**", "/locations/**", "/gear/**", "/stats/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/*/new", "/*/*/edit",
+                        .requestMatchers("/clients/**", "/locations/**", "/gear/**", "/stats/**",
+                                "/shoots/new", "/shoots/*/edit",
                                 "/shoots/*/media/**", "/shoots/*/invoice/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/**").hasRole("ADMIN")
-                        .anyRequest().authenticated()
+                        .requestMatchers(HttpMethod.GET, "/", "/shoots", "/shoots/*")
+                                .hasAnyRole("ADMIN", "CLIENT")
+                        .anyRequest().hasRole("ADMIN")
                 )
                 .userDetailsService(userDetailsService)
                 .formLogin(form -> form

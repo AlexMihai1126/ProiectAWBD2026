@@ -26,7 +26,9 @@ CREATE TABLE client (
     name VARCHAR(150) NOT NULL,
     email VARCHAR(200),
     phone VARCHAR(30),
-    notes VARCHAR(1000)
+    notes VARCHAR(1000),
+    user_id BIGINT UNIQUE,
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 CREATE TABLE location (
@@ -57,10 +59,13 @@ CREATE TABLE shoot (
     notes VARCHAR(2000),
     owner_user_id BIGINT NOT NULL,
     location_id BIGINT NOT NULL,
+    client_id BIGINT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
     FOREIGN KEY (owner_user_id) REFERENCES users(id),
-    FOREIGN KEY (location_id) REFERENCES location(id)
+    FOREIGN KEY (location_id) REFERENCES location(id),
+    FOREIGN KEY (client_id) REFERENCES client(id),
+    CONSTRAINT chk_shoot_dates CHECK (end_at IS NULL OR end_at >= start_at)
 );
 
 CREATE TABLE shoot_gear (

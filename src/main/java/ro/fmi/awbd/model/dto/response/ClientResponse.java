@@ -15,4 +15,6 @@ public class ClientResponse {
     private String email;
     private String phone;
     private String notes;
+    private Long userId;
+    private String username;
 }

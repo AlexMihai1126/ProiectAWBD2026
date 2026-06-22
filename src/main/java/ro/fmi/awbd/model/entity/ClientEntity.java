@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import ro.fmi.awbd.model.entity.security.User;
 
 @Entity
 @Table(name = "client")
@@ -35,5 +36,8 @@ public class ClientEntity {
     @Size(max = 1000)
     @Column(length = 1000)
     private String notes;
-}
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", unique = true)
+    private User user;
+}

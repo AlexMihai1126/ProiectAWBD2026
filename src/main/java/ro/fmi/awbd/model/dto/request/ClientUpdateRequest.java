@@ -27,4 +27,6 @@ public class ClientUpdateRequest {
 
     @Size(max = 1000)
     private String notes;
+
+    private Long userId;
 }
