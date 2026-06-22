@@ -3,7 +3,7 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/layout :: head('Shoot')}"></head>
 <body>
-<nav th:replace="~{fragments/layout :: nav}"></nav>
+<nav th:replace="~{fragments/layout :: mainNav}"></nav>
 <div th:replace="~{fragments/layout :: flash}"></div>
 <main class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -44,7 +44,11 @@
         <tbody>
         <tr th:each="m : ${media}">
             <td th:text="${m.mediaType}">type</td>
-            <td th:text="${m.fileRef}">file</td>
+            <td th:with="href=${@mediaLink.toHref(m.fileRef)}">
+                <a th:if="${href != null}" th:href="${href}" th:text="${m.fileRef}"
+                   target="_blank" rel="noopener noreferrer">file</a>
+                <span th:if="${href == null}" th:text="${m.fileRef}">file</span>
+            </td>
             <td th:text="${m.rating}">-</td>
             <td th:text="${@dateTime.formatDisplay(m.takenAt)}">-</td>
             <td class="text-end">

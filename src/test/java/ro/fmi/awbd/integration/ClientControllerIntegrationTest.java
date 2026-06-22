@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @IntegrationTest
 class ClientControllerIntegrationTest {
@@ -33,6 +34,15 @@ class ClientControllerIntegrationTest {
         mockMvc.perform(get("/clients"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("fa-arrow-up")));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = "ADMIN")
+    void paginationIsRenderedOnlyOnceBelowTheList() throws Exception {
+        mockMvc.perform(get("/clients").param("size", "1"))
+                .andExpect(status().isOk())
+                .andExpect(result -> assertThat(result.getResponse().getContentAsString())
+                        .containsOnlyOnce("aria-label=\"Page navigation\""));
     }
 
     @Test

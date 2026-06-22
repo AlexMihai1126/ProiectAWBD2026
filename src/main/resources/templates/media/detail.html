@@ -3,7 +3,7 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/layout :: head('Media details')}"></head>
 <body>
-<nav th:replace="~{fragments/layout :: nav}"></nav>
+<nav th:replace="~{fragments/layout :: mainNav}"></nav>
 <main class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="h3 mb-0">Media details</h1>
@@ -16,7 +16,12 @@
 
     <dl class="row">
         <dt class="col-sm-3">Type</dt><dd class="col-sm-9" th:text="${media.mediaType}">-</dd>
-        <dt class="col-sm-3">File reference</dt><dd class="col-sm-9" th:text="${media.fileRef}">-</dd>
+        <dt class="col-sm-3">File reference</dt>
+        <dd class="col-sm-9" th:with="href=${@mediaLink.toHref(media.fileRef)}">
+            <a th:if="${href != null}" th:href="${href}" th:text="${media.fileRef}"
+               target="_blank" rel="noopener noreferrer">-</a>
+            <span th:if="${href == null}" th:text="${media.fileRef}">-</span>
+        </dd>
         <dt class="col-sm-3">Taken at</dt><dd class="col-sm-9" th:text="${@dateTime.formatDisplay(media.takenAt)}">-</dd>
         <dt class="col-sm-3">Rating</dt><dd class="col-sm-9" th:text="${media.rating}">-</dd>
         <dt class="col-sm-3">ISO</dt><dd class="col-sm-9" th:text="${media.iso}">-</dd>
