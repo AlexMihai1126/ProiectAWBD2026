@@ -69,9 +69,9 @@ DTO-urile (`request` / `response`) și mapper-ele MapStruct separă entitățile
 
 | Entitate    | Descriere                                  |
 | ----------- | ------------------------------------------ |
-| `User`      | Utilizator autentificat (admin, fotograf sau cont client) |
+| `User`      | Utilizator autentificat (admin sau cont client) |
 | `Authority` | Rol (`ROLE_ADMIN`, `ROLE_CLIENT`)          |
-| `Client`    | Client al firmei                           |
+| `Client`    | Client al firmei, asociat cu un User       |
 | `Location`  | Locație de shoot (cu geolocație opțională) |
 | `GearItem`  | Echipament foto deținut de un fotograf     |
 | `Shoot`     | Ședință foto/video                         |
@@ -85,7 +85,7 @@ DTO-urile (`request` / `response`) și mapper-ele MapStruct separă entitățile
 | Tip                         | Relație                                                                                                                                 |
 | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
 | `@OneToOne`                 | `Shoot` ↔ `Invoice`, `User` ↔ `Client` (cont portal client)                                                                             |
-| `@OneToMany` / `@ManyToOne` | `Shoot` → `Media`, `Shoot` → `Location`, `Shoot` → `User` (fotograf), `Shoot` → `Client`, `Invoice` → `Client`, `GearItem` → `User` |
+| `@OneToMany` / `@ManyToOne` | `Shoot` → `Media`, `Shoot` → `Location`, `Shoot` → `User` (fotograf), `Shoot` → `Client`, `Invoice` → `Client`, `GearItem` → `User`     |
 | `@ManyToMany`               | `Shoot` ↔ `GearItem`, `User` ↔ `Authority`                                                                                              |
 
 
@@ -154,7 +154,7 @@ erDiagram
 
 ## Medii și profiluri Spring
 
-Conform cerinței proiectului (Lab 2): **2 profiluri Spring** cu **2 baze de date diferite** și fișiere de configurare separate.
+**2 profiluri Spring** cu **2 baze de date diferite** și fișiere de configurare separate.
 
 | Profil | Fișier | Bază de date | Utilizare |
 |--------|--------|--------------|-----------|
@@ -163,13 +163,13 @@ Conform cerinței proiectului (Lab 2): **2 profiluri Spring** cu **2 baze de dat
 
 Profilul implicit la pornire (fără argumente): **`test`**.
 
-Scripturile SQL (`schema-h2.sql`, `schema-postgresql.sql`) creează schema la pornire. `DataLoader` inserează utilizatorii impliciți dacă baza este goală.
+Script-urile SQL (`schema-h2.sql`, `schema-postgresql.sql`) creează schema la pornire. `DataLoader` inserează utilizatorii impliciți dacă baza de date este goală.
 
 ## Cerințe
 
 - **JDK 21**
 - **Gradle** (wrapper inclus: `gradlew` / `gradlew.bat`)
-- **Docker** (opțional, doar pentru profilul `dev`)
+- **Docker** (doar pentru profilul `dev`)
 
 ## Rulare locală
 
@@ -226,7 +226,7 @@ docker compose down -v
 docker compose up -d postgres
 ```
 
-Profilul `dev` a fost testat cu PostgreSQL în Docker (schema + login + CRUD).
+Profilul `dev` a fost testat cu PostgreSQL în container Docker (schema + login + CRUD).
 
 ### 3. IDE
 
@@ -246,7 +246,7 @@ Configurări incluse în `.run/`:
 | `client3`  | `client3`| CLIENT | Vizualizarea ședințelor proprii               |
 
 
-Utilizatorii neautorizați pentru o acțiune sunt redirecționați către `/access_denied` (403).
+Utilizatorii neautorizați pentru o anumită acțiune sunt redirecționați către `/access_denied` (cod HTTP 403).
 
 ## Rute aplicație (MVC)
 
@@ -310,7 +310,7 @@ Aplicația expune pagini Thymeleaf (nu REST JSON). Rolurile provin din Spring Se
 | POST | `/shoots/{id}` | ADMIN | Actualizare |
 | POST | `/shoots/{id}/delete` | ADMIN | Ștergere |
 
-### Media (nested under shoot)
+### Media (în pagina shoot)
 
 | Metodă | Rută | Rol | Descriere |
 | ------ | ---- | --- | --------- |
@@ -321,7 +321,7 @@ Aplicația expune pagini Thymeleaf (nu REST JSON). Rolurile provin din Spring Se
 | POST | `/shoots/{shootId}/media/{mediaId}` | ADMIN | Actualizare |
 | POST | `/shoots/{shootId}/media/{mediaId}/delete` | ADMIN | Ștergere |
 
-### Factură (nested under shoot, admin)
+### Factură (în pagina shoot)
 
 | Metodă | Rută | Rol | Descriere |
 | ------ | ---- | --- | --------- |
@@ -343,8 +343,6 @@ Aplicația expune pagini Thymeleaf (nu REST JSON). Rolurile provin din Spring Se
 | ------ | ---- | --- | --------- |
 | GET | `/h2-console/**` | ADMIN | Consolă H2 (doar profil `test`) |
 
-## Validare și gestionarea erorilor
-
 ### Validare formulare (server + client)
 
 
@@ -358,7 +356,7 @@ Aplicația expune pagini Thymeleaf (nu REST JSON). Rolurile provin din Spring Se
 
 Exemplu: la creare client fără nume, mesajul de eroare apare lângă câmp; email invalid este respins de `@Email`.
 
-### Pagini și handler-e de eroare
+### Pagini și error handler
 
 
 | Situație                                          | HTTP | View                |
@@ -373,7 +371,7 @@ Exemplu: la creare client fără nume, mesajul de eroare apare lângă câmp; em
 
 `GlobalExceptionHandler` (`@ControllerAdvice`) centralizează excepțiile custom (`BadRequestException`, `DuplicateResourceException`, etc.) și loghează la WARN/ERROR.
 
-Pagina **Stats** validează intervalul de timp în controller: dacă `from` este după `to`, se afișează un alert Bootstrap pe aceeași pagină (fără redirect).
+Pagina **Stats** validează intervalul de timp în controller: dacă data `from` este după `to`, se afișează un mesaj în aceeași pagină.
 
 ## Capturi de ecran
 
@@ -457,16 +455,16 @@ Testele folosesc profilul `test` cu bază de date in-memory izolată (`jdbc:h2:m
 - ADMIN poate crea client și deschide formulare CRUD (`ClientControllerIntegrationTest`, `ShootControllerIntegrationTest`)
 - Stats: ADMIN vede erori de interval invalid; CLIENT nu accesează `/stats` (`StatsControllerIntegrationTest`)
 
-## Structură proiect
+## Structură fișiere proiect
 
 ```
 src/main/java/ro/fmi/awbd/
 ├── controller/       # MVC
-├── service/          # Business logic
+├── service/          # Logică de business
 ├── repository/       # JPA
 ├── model/            # entity, dto, enums, mapper
 ├── config/           # Security, Web
-└── exception/        # Error handling
+└── exception/        # Tratare de erori
 
 src/main/resources/
 ├── schema-h2.sql
@@ -474,35 +472,28 @@ src/main/resources/
 ├── application-test.yml
 ├── application-dev.yml
 ├── logback-spring.xml
-└── templates/        # Thymeleaf
+└── templates/        # Pagini Thymeleaf
 ```
 
-## Contributii echipa
+## Contribuții echipă
 
-> Contribuțiile de mai jos reflectă commit-urile din repository. Fiecare membru
-> este responsabil să livreze cod curat, fără regresii, și să verifice manual
-> fluxurile afectate înainte de push.
-
-### Chirita George
-- Strat de servicii **CRUD** pentru entitățile principale
+### Chiriță George
+- Servicii **CRUD** pentru entitățile principale
 - Controllere **MVC** și view-uri **Thymeleaf**
 - **Spring Security**: roluri, logout, remember-me, restricții de acces
-- Corecții schemă **PostgreSQL** și integrare
+- Îmbunătățire schemă **PostgreSQL** și integrare
 
 
 ### Alexandru Mihai
-- Structura inițială a proiectului, dependențe și configurare **Spring Security**
+- Structura inițială a proiectului, modele, container Docker, dependințe și configurare **Spring Security**
 - Integrarea modelului client cu cont utilizator (`ROLE_CLIENT`) și ședințe
-- Formatare dată/timp în UI, pagină detaliu media, validări
-- Teste de integrare pentru noile componente și actualizări **README**
+- Formatare date în UI, pagină detalii media, validări
+- Teste pentru noile componente
+- Introducere date, testare manuală UI, validări
 
 
 ### Tudor Bogdan
 - Scheme SQL complete (**H2** + **PostgreSQL**) și seed utilizatori
-- Configurare logging (**Logback**), suite de teste unitare/integrare, **JaCoCo**
+- Configurare logging (**Logback**), suite de teste unitare și de integrare, **JaCoCo**
 - Profiluri Spring `dev` / `test`, documentație README (ER, rute, capturi)
 - Gestionare erori, pagină *access denied*, verificare CRUD
-
-
-
-
