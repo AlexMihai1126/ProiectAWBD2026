@@ -479,25 +479,36 @@ src/main/resources/
 
 ## Contributii echipa
 
-Contribuțiile de mai jos reflectă commit-urile din repository; fiecare membru este responsabil să livreze cod curat, fara regresii, și să verifice manual fluxurile afectate înainte de push.
-Chirita George
-•	Strat de servicii CRUD pentru entitățile principale
-•	Controllere MVC si view-uri Thymeleaf
-•	Spring Security: roluri, logout, remember-me, restricții de acces
-•	Corecții schema PostgreSQL și integrare
-•	Calitate: menținerea stabilității stratului de business și a regulilor de securitate; testare CRUD si autentificare înainte de commit.
-Alexandru Mihai
-•	Structura inițială a proiectului, dependențe și configurare Spring Security
-•	Integrarea modelului client cu cont utilizator (ROLE_CLIENT) si sedinte
-•	Formatare date/timp în UI, pagină detaliu media, validări
-•	Teste de integrare pentru noile componente și actualizări README
-•	Calitate: verificarea fluxurilor end-to-end (admin + client) și a testelor automate pentru modificările de UI și securitate.
-Tudor Bogdannn
-•	Scheme SQL complete (H2 + PostgreSQL) si seed utilizatori
-•	Configurare logging (Logback), suite de teste unitare/integrare, JaCoCo
-•	Profiluri Spring dev / test, documentație README (ER, rute, capturi)
-•	Gestionare erori, pagină access denied, verificare CRUD
-•	Calitate: rularea ./gradlew.bat check înainte de commit și evitarea regresiilor în DB, teste și documentație.
+> Contribuțiile de mai jos reflectă commit-urile din repository. Fiecare membru
+> este responsabil să livreze cod curat, fără regresii, și să verifice manual
+> fluxurile afectate înainte de push.
+
+### Chirita George
+- Strat de servicii **CRUD** pentru entitățile principale
+- Controllere **MVC** și view-uri **Thymeleaf**
+- **Spring Security**: roluri, logout, remember-me, restricții de acces
+- Corecții schemă **PostgreSQL** și integrare
+
+> **Calitate:** menținerea stabilității stratului de business și a regulilor de
+> securitate; testare CRUD și autentificare înainte de commit.
+
+### Alexandru Mihai
+- Structura inițială a proiectului, dependențe și configurare **Spring Security**
+- Integrarea modelului client cu cont utilizator (`ROLE_CLIENT`) și ședințe
+- Formatare dată/timp în UI, pagină detaliu media, validări
+- Teste de integrare pentru noile componente și actualizări **README**
+
+> **Calitate:** verificarea fluxurilor end-to-end (admin + client) și a testelor
+> automate pentru modificările de UI și securitate.
+
+### Tudor Bogdan
+- Scheme SQL complete (**H2** + **PostgreSQL**) și seed utilizatori
+- Configurare logging (**Logback**), suite de teste unitare/integrare, **JaCoCo**
+- Profiluri Spring `dev` / `test`, documentație README (ER, rute, capturi)
+- Gestionare erori, pagină *access denied*, verificare CRUD
+
+> **Calitate:** rularea `./gradlew.bat check` înainte de commit și evitarea
+> regresiilor în DB, teste și documentație.
 
 
 
