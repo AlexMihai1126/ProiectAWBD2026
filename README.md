@@ -489,8 +489,6 @@ src/main/resources/
 - **Spring Security**: roluri, logout, remember-me, restricții de acces
 - Corecții schemă **PostgreSQL** și integrare
 
-> **Calitate:** menținerea stabilității stratului de business și a regulilor de
-> securitate; testare CRUD și autentificare înainte de commit.
 
 ### Alexandru Mihai
 - Structura inițială a proiectului, dependențe și configurare **Spring Security**
@@ -498,8 +496,6 @@ src/main/resources/
 - Formatare dată/timp în UI, pagină detaliu media, validări
 - Teste de integrare pentru noile componente și actualizări **README**
 
-> **Calitate:** verificarea fluxurilor end-to-end (admin + client) și a testelor
-> automate pentru modificările de UI și securitate.
 
 ### Tudor Bogdan
 - Scheme SQL complete (**H2** + **PostgreSQL**) și seed utilizatori
@@ -507,8 +503,6 @@ src/main/resources/
 - Profiluri Spring `dev` / `test`, documentație README (ER, rute, capturi)
 - Gestionare erori, pagină *access denied*, verificare CRUD
 
-> **Calitate:** rularea `./gradlew.bat check` înainte de commit și evitarea
-> regresiilor în DB, teste și documentație.
 
 
 
